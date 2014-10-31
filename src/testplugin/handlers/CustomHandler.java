@@ -57,6 +57,7 @@ public class CustomHandler extends AbstractHandler implements ActionListener{
 		btnMigrate = new JButton("Migrate");
 		btnMigrate.setBounds(203, 203, 117, 29);
 		frame.getContentPane().add(btnMigrate);
+		btnMigrate.addActionListener(this);
 		
 		Choice choice = new Choice();
 		choice.setBounds(203, 62, 125, 27);
@@ -68,8 +69,6 @@ public class CustomHandler extends AbstractHandler implements ActionListener{
 		textField.setColumns(10);
 		
 		frame.setVisible(true);
-		
-		btnMigrate.addActionListener(this);
 	}
 	
 	public void actionPerformed(ActionEvent e){
