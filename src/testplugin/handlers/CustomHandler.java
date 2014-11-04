@@ -81,12 +81,15 @@ public class CustomHandler extends AbstractHandler implements ActionListener{
 			}
 			
 		});
+		
+/*
 		for(int i=0; i<listOfFiles.length; i++){
 			if(listOfFiles[i].isFile()){
 				String file= listOfFiles[i].getName();
 				choice.add(file);	
 			}
 		}
+*/
 		frame.getContentPane().add(choice);
 	
 		frame.setVisible(true);
