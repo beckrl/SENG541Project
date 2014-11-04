@@ -4,6 +4,10 @@ import java.awt.Choice;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FilenameFilter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.jar.JarFile;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -68,6 +72,21 @@ public class CustomHandler extends AbstractHandler implements ActionListener{
 		
 		Choice choice = new Choice();
 		choice.setBounds(203, 62, 200, 30);
+		File jarFolder= new File("C:\\Program Files\\Java\\jre1.8.0_20\\lib");
+		File[] listOfFiles= jarFolder.listFiles(new FilenameFilter(){
+
+			@Override
+			public boolean accept(File jarFolder, String name) {
+				return name.toLowerCase().endsWith(".jar");
+			}
+			
+		});
+		for(int i=0; i<listOfFiles.length; i++){
+			if(listOfFiles[i].isFile()){
+				String file= listOfFiles[i].getName();
+				choice.add(file);	
+			}
+		}
 		frame.getContentPane().add(choice);
 	
 		frame.setVisible(true);
