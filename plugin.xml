@@ -1,58 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-	<!--
+
 	<extension point="org.eclipse.ui.commands">
 		<command
-			id="testPlugin.commands.sampleCommand"
-			name="API Migration">
+			locationURI="popup:org.eclipse.jdt.ui.PackageExplorer"
+			id="api.migration.commands.MigrationCommand"
+			name="Context">
 		</command>
 	</extension>
-	-->
 
-	<extension point="org.eclipse.ui.handlers">
+
+	<extension point="org.eclipse.ui.handlers">		
 		<handler
-			commandId="testPlugin.commands.CustomCommand"
-            class="testplugin.handlers.CustomHandler">
-		</handler>
-		
-		<handler
-			commandId="testPlugin.commands.SampleCommand"
-            class="testplugin.handlers.SampleHandler">
+			commandId="api.migration.commands.MigrationCommand"
+            class="api.migration.handlers.MigrationHandler">
 		</handler>
 	</extension>
    
    
-	<extension point="org.eclipse.ui.menus">
+	<extension point="org.eclipse.ui.menus">		
 		<menuContribution
 			locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
             <command	
-				commandId="testPlugin.commands.CustomCommand"
+				commandId="api.migration.commands.MigrationCommand"
 				label="API Migration">
             </command>
 		</menuContribution>
 		
 		<menuContribution
 			locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
-            <command
-				commandId="testPlugin.commands.CustomCommand"
+            <command	
+				commandId="api.migration.commands.MigrationCommand"
 				label="API Migration">
-            </command>
-		</menuContribution>
-		
-		<menuContribution
-			locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
-            <command	
-				commandId="testPlugin.commands.SampleCommand"
-				label="Click Me, You Know You Want To!">
-            </command>
-		</menuContribution>
-		
-		<menuContribution
-			locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
-            <command	
-				commandId="testPlugin.commands.SampleCommand"
-				label="Click Me, You Know You Want To!">
             </command>
 		</menuContribution>
 	</extension>
