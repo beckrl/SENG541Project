@@ -130,7 +130,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 						
 		// Old jar selection dropdown menu
 		oldJarChoice = new Choice();
-		oldJarChoice.removeAll();
 		oldJarChoice.setBounds(200, 95, 200, 30);
 		selectionFrame.getContentPane().add(oldJarChoice);
 		
@@ -158,6 +157,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 					} catch (JavaModelException e) {
 						e.printStackTrace();
 					}
+	        		
+	        		oldJarChoice.removeAll();
 
 	        		// From the classpath list, add only the libraries to the second dropdown menu
 	        		for (IClasspathEntry entry : entries) {
