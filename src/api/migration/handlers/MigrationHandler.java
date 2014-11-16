@@ -6,7 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -21,14 +23,18 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -44,6 +50,8 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jface.text.Document;
+import org.eclipse.ltk.core.refactoring.RefactoringContribution;
+import org.eclipse.ltk.core.refactoring.RefactoringCore;
 
 import api.migration.MethodVisitor;
 
@@ -53,8 +61,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	/* Class Variables */
 	private IProject[] workspaceProjects;
 	private IProject selectedProject;
-	private IProject cloneProject;
+	private IProject clonedProject;
 	
+	private String workspacePath;
 	private String oldJarPath;
 	private String newJarPath;
 	
@@ -66,14 +75,21 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 
 	private JTextArea textBox;
 	
+	//
+	
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	
 	
-	/* Executes when "API Migration" button is clicked on context menu */
+	/* 
+	 * Executes when "API Migration" button is clicked on context menu 
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// Access the current Eclipse workspace
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 	    IWorkspaceRoot root = workspace.getRoot();
+	    
+	    // Saves the full path of the workspace
+	    workspacePath = root.getLocation().toString();
 	    
 	    // Get all projects in the workspace and store them in IProject[] projects
 	    workspaceProjects = root.getProjects();
@@ -84,7 +100,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	}
 	
 	
-	/* Draw the pop-up window when API Migration button is clicked. */
+	/* 
+	 * Draw the pop-up window when API Migration button is clicked. 
+	 */
 	private void drawFrame() {
 		// Setting up the frame
 		JFrame frame = new JFrame();
@@ -162,7 +180,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        public void itemStateChanged(ItemEvent ie)
 	        {
 	        	oldJarPath = oldJarChoice.getSelectedItem();
-	        	System.out.println(oldJarPath);
+	        	System.out.println("Old jar path: " + oldJarPath);
 	        }
 	    });
 	    	    
@@ -183,7 +201,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	}
 	
 	
-	/* Responses to actions in the first pop-up window */
+	/* 
+	 * Responses to actions in the first pop-up window
+	 */
 	public void actionPerformed(ActionEvent e) {
 		// Button that opens window for selecting new jar file
 		if (e.getSource() == selectNewJarButton) {
@@ -195,28 +215,84 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        if (returnValue == JFileChooser.APPROVE_OPTION) {
 	        	File selectedFile = fileChooser.getSelectedFile();
 	        	newJarPath = selectedFile.getPath();
-	        	
-	        	System.out.println(selectedFile.getPath());
 	        }
 		}
 		
 		// Migration Button
 		if (e.getSource() == migrateButton) {
-			
-			// ------ CODE TO CREATE NEW PROJECT GOES HERE -------
-			
+			// Clone the selected project as ProjectName-new 
+			try { cloneSelectedProject(selectedProject.getLocation().toString()); }
+			catch (CoreException | FileNotFoundException e1) { e1.printStackTrace(); }
+						
+			/*
+			// Draw the second window showing compilations errors and prompting user for recommendation algorithm
 			drawRecommendationWindow();
 			
-			try {
-				analyseMethods(selectedProject);
-			} catch (JavaModelException e1) {
-				e1.printStackTrace();
-			}
+			try { analyseMethods(selectedProject); } 
+			catch (JavaModelException e1) { e1.printStackTrace(); }
+			*/
 		}		
 	}
 	
+	
+	/* 
+	 * Creates a duplicate of the selectedProject with the new jar file
+	 */
+	public void cloneSelectedProject(String projectPath) throws CoreException, FileNotFoundException {		
+		File srcDir = new File(projectPath);
+		File destDir = new File(projectPath + "-new");
+		
+		if ( !srcDir.exists() ) {
+			throw new FileNotFoundException("Source project not found");
+		}
+		
+		// Duplicate the selected project as ProjectName-new in the workspace
+		try { FileUtils.copyDirectory(srcDir, destDir); }
+		catch (IOException e) { e.printStackTrace(); }
+		
+		// Get the project name from the project's description
+		IProjectDescription description;
+		description = ResourcesPlugin.getWorkspace().loadProjectDescription(new Path(projectPath + "-new/.project"));
+		String projectName = description.getName();
 
-	/* Draws the second pop-up window after Migrate button has be clicked */ 
+		// Replace the Project Name in the description of the cloned project
+		try {
+			String content = FileUtils.readFileToString(new File(projectPath + "/.project"));
+			content = content.replaceAll(projectName, projectName+"-new");
+			File tempFile = new File(projectPath + "-new/.project");
+			FileUtils.writeStringToFile(tempFile, content);
+		} catch (IOException e) { e.printStackTrace(); }
+		
+		// Update the cloned project description and save the project as IProject clonedProject
+		// Import the project into the Eclipse package explorer
+		description = ResourcesPlugin.getWorkspace().loadProjectDescription(new Path(projectPath + "-new/.project"));
+		clonedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
+		clonedProject.create(description, null);
+		clonedProject.open(null);
+	}
+	
+		
+	/*
+	 * Modifies the classpath of a project
+	 */
+	private void changeClasspath(IProject project) throws JavaModelException {
+		IJavaProject javaProject = JavaCore.create(project);
+		IClasspathEntry[] entries = javaProject.getRawClasspath();
+		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
+
+		System.arraycopy(entries, 0, newEntries, 0, entries.length);
+
+		// add a new entry using the path to the container
+		Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
+		IClasspathEntry junitEntry = JavaCore.newContainerEntry(junitPath);
+		newEntries[entries.length] = JavaCore.newContainerEntry(junitEntry.getPath());
+		javaProject.setRawClasspath(newEntries, null);
+	}
+	
+
+	/* 
+	 * Draws the second pop-up window after Migrate button has be clicked
+	 */ 
 	public void drawRecommendationWindow() {
 		JFrame frame = new JFrame();
 		JPanel panel = new JPanel();
@@ -249,26 +325,11 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		
 		frame.setVisible(true);
 	}
+
 	
-	
-	/* Online tutorial uses this to add to classpath
-	 * we can use something like this to add our new jar to our newly created project 
+	/*
+	 * Analyse the method calls in project
 	 */
-	private void changeClasspath(IProject project) throws JavaModelException {
-		IJavaProject javaProject = JavaCore.create(project);
-		IClasspathEntry[] entries = javaProject.getRawClasspath();
-		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
-
-		System.arraycopy(entries, 0, newEntries, 0, entries.length);
-
-		// add a new entry using the path to the container
-		Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
-		IClasspathEntry junitEntry = JavaCore.newContainerEntry(junitPath);
-		newEntries[entries.length] = JavaCore.newContainerEntry(junitEntry.getPath());
-		javaProject.setRawClasspath(newEntries, null);
-	}
-	
-	
 	private void analyseMethods(IProject project) throws JavaModelException {
 		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
 		// parse(JavaCore.create(project));
@@ -280,6 +341,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	}
 
 	
+	/*
+	 * Create AST
+	 */
 	private void createAST(IPackageFragment mypackage) throws JavaModelException {
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
 			// now create the AST for the ICompilationUnits
@@ -295,10 +359,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	}
 	
 	
-	/*
-	 * Reads a ICompilationUnit and creates the AST DOM for manipulating the
-	 * Java source file
-	 */
+	/* 
+	 * Reads a ICompilationUnit and creates the AST DOM for manipulating the Java source file
+	 */ 
 	private static CompilationUnit parse(ICompilationUnit unit) {
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
@@ -308,7 +371,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	}
 	
 	
-	/* The following methods are from the online tutorial - don't know if we'll need them */
+	/* The following methods are from the online tutorial - don't know if we'll need them
 	private void printProjectInfo(IProject project) throws CoreException, JavaModelException {
 		System.out.println("Working in project " + project.getFullPath());
 		// check if we have a Java project
@@ -359,4 +422,5 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			System.out.println("Return Type " + method.getReturnType());
 		}
 	}
+	*/
 }
