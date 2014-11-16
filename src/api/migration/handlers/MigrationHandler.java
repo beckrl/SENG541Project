@@ -290,8 +290,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		IJavaProject javaProject = JavaCore.create(project);
 		IClasspathEntry[] entries = javaProject.getRawClasspath();
 		
-		for (int i = 0; i < entries.length; i++) {			
-			if ( oldJarPath.matches( entries[i].getPath().toString() )) {
+		for (int i = 0; i < entries.length; i++) {
+			if ( oldJarPath.replace("\\", "/").matches( entries[i].getPath().toString() )) {
 				IClasspathEntry newJarEntry = JavaCore.newLibraryEntry(new Path(newJarPath), null, null);
 				entries[i] = newJarEntry;
 				javaProject.setRawClasspath(entries, null);
