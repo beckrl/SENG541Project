@@ -68,9 +68,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private Choice projectChoice;
 	private Choice oldJarChoice;
 	
+	private JFrame selectionFrame;
 	private JButton selectNewJarButton;
 	private JButton migrateButton;
-
 	private JTextArea textBox;
 	
 	
@@ -99,29 +99,29 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	 */
 	private void drawFrame() {
 		// Setting up the frame
-		JFrame frame = new JFrame();
-		frame = new JFrame();
+		selectionFrame = new JFrame();
 		
-		frame.setBounds(150, 150, 450, 300);
-		frame.getContentPane().setLayout(null);
+		selectionFrame.setBounds(150, 150, 450, 300);
+		selectionFrame.getContentPane().setLayout(null);
 		
 		// Setting up labels
 		JLabel lblSelectProject = new JLabel("Select your project:");
 		lblSelectProject.setBounds(25, 50, 163, 16);
-		frame.getContentPane().add(lblSelectProject);
+		selectionFrame.getContentPane().add(lblSelectProject);
 		
 		JLabel lblSelectOldJar = new JLabel("Select existing .jar file:");
 		lblSelectOldJar.setBounds(25, 100, 163, 16);
-		frame.getContentPane().add(lblSelectOldJar);
+		selectionFrame.getContentPane().add(lblSelectOldJar);
 		
 		JLabel lblSelectNewJar = new JLabel("Select replacement .jar files:");
 		lblSelectNewJar.setBounds(25, 150, 163, 16);
-		frame.getContentPane().add(lblSelectNewJar);
+		selectionFrame.getContentPane().add(lblSelectNewJar);
 		
 		// Project selection dropdown menu
 		projectChoice = new Choice();
+		projectChoice.removeAll();
 		projectChoice.setBounds(200, 45, 200, 30);
-		frame.getContentPane().add(projectChoice);
+		selectionFrame.getContentPane().add(projectChoice);
 		
 		//Add list of projects to dropdown menu
 		for (IProject project : workspaceProjects) {
@@ -130,8 +130,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 						
 		// Old jar selection dropdown menu
 		oldJarChoice = new Choice();
+		oldJarChoice.removeAll();
 		oldJarChoice.setBounds(200, 95, 200, 30);
-		frame.getContentPane().add(oldJarChoice);
+		selectionFrame.getContentPane().add(oldJarChoice);
 		
 		// Listener for when a project is selected
 	    projectChoice.addItemListener( new ItemListener() {
@@ -147,9 +148,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        		}
 	        	}
 	        	
-	        	if (selectedProject != null) {
-	        		oldJarChoice.removeAll();
-	        		
+	        	if (selectedProject != null) {	        		
 	        		// Access the build path of the project
 	        		IJavaProject javaProject = JavaCore.create(selectedProject);
 	        		IClasspathEntry[] entries = null;
@@ -183,17 +182,17 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		// Selecting a new jar file button
 	    selectNewJarButton = new JButton("Select Jar File");
 		selectNewJarButton.setBounds(235, 145, 120, 30);
-		frame.getContentPane().add(selectNewJarButton);
+		selectionFrame.getContentPane().add(selectNewJarButton);
 		selectNewJarButton.addActionListener(this);
 	    
 		// Migration button
 		migrateButton = new JButton("Migrate");
 		migrateButton.setBounds(150, 210, 150, 30);
-		frame.getContentPane().add(migrateButton);
+		selectionFrame.getContentPane().add(migrateButton);
 		migrateButton.addActionListener(this);
 			    				
 	    // Make the frame visible
-		frame.setVisible(true);
+		selectionFrame.setVisible(true);
 	}
 	
 	
@@ -217,17 +216,19 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		
 		// Migration Button
 		if (e.getSource() == migrateButton) {
-			// Clone the selected project as ProjectName-new 
-			try { cloneSelectedProject(selectedProject.getLocation().toString()); }
-			catch (CoreException | FileNotFoundException e1) { e1.printStackTrace(); }
-						
-			/*
-			// Draw the second window showing compilations errors and prompting user for recommendation algorithm
-			drawRecommendationWindow();
-			
-			try { analyseMethods(selectedProject); } 
-			catch (JavaModelException e1) { e1.printStackTrace(); }
-			*/
+			if (oldJarPath != null && newJarPath != null) {
+				// Clone the selected project as ProjectName-new 
+				try { cloneSelectedProject(selectedProject.getLocation().toString()); }
+				catch (CoreException | FileNotFoundException e1) { e1.printStackTrace(); }
+							
+				// Draw the second window showing compilations errors and prompting user for recommendation algorithm
+				drawRecommendationWindow();
+				
+				try { analyseMethods(clonedProject); } 
+				catch (JavaModelException e1) { e1.printStackTrace(); }
+				
+				selectionFrame.setVisible(false);
+			}
 		}		
 	}
 	
@@ -311,7 +312,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		panel.setLayout(null);
 		
 		// Temporary close on exit to make it easier to test
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
 		textBox = new JTextArea();
 		textBox.setEditable(false);
