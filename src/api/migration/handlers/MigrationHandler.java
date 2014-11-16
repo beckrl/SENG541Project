@@ -73,10 +73,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 
 	private JTextArea textBox;
 	
-	//
-	
-	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
-	
 	
 	/* 
 	 * Executes when "API Migration" button is clicked on context menu 
@@ -152,6 +148,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        	}
 	        	
 	        	if (selectedProject != null) {
+	        		oldJarChoice.removeAll();
+	        		
 	        		// Access the build path of the project
 	        		IJavaProject javaProject = JavaCore.create(selectedProject);
 	        		IClasspathEntry[] entries = null;
@@ -213,6 +211,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        if (returnValue == JFileChooser.APPROVE_OPTION) {
 	        	File selectedFile = fileChooser.getSelectedFile();
 	        	newJarPath = selectedFile.getPath();
+	        	System.out.println("New jar path: " + newJarPath);
 	        }
 		}
 		
@@ -265,8 +264,20 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		// Import the project into the Eclipse package explorer
 		description = ResourcesPlugin.getWorkspace().loadProjectDescription(new Path(projectPath + "-new/.project"));
 		clonedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
-		clonedProject.create(description, null);
-		clonedProject.open(null);
+		
+		Boolean alreadyCopied = false;
+		for (IProject entry : workspaceProjects) {
+			if (clonedProject == entry) {
+				alreadyCopied = true;
+			}
+		}
+		
+		if(alreadyCopied == false) {
+			clonedProject.create(description, null);
+			clonedProject.open(null);
+		}
+		
+		changeClasspath(clonedProject);
 	}
 	
 		
@@ -276,15 +287,14 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private void changeClasspath(IProject project) throws JavaModelException {
 		IJavaProject javaProject = JavaCore.create(project);
 		IClasspathEntry[] entries = javaProject.getRawClasspath();
-		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
-
-		System.arraycopy(entries, 0, newEntries, 0, entries.length);
-
-		// add a new entry using the path to the container
-		Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
-		IClasspathEntry junitEntry = JavaCore.newContainerEntry(junitPath);
-		newEntries[entries.length] = JavaCore.newContainerEntry(junitEntry.getPath());
-		javaProject.setRawClasspath(newEntries, null);
+		
+		for (int i = 0; i < entries.length; i++) {			
+			if ( oldJarPath.matches( entries[i].getPath().toString() )) {
+				IClasspathEntry newJarEntry = JavaCore.newLibraryEntry(new Path(newJarPath), null, null);
+				entries[i] = newJarEntry;
+				javaProject.setRawClasspath(entries, null);
+			}
+		}
 	}
 	
 
