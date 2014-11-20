@@ -217,6 +217,11 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		
 		// Migration Button
 		if (e.getSource() == migrateButton) {
+			if ( oldJarChoice.getItemCount() == 1 ) {
+				oldJarPath = oldJarChoice.getItem(0);
+				System.out.println(oldJarPath);
+			}
+			
 			if (oldJarPath != null && newJarPath != null) {
 				// Clone the selected project as ProjectName-new 
 				try { cloneSelectedProject(selectedProject.getLocation().toString()); }
@@ -348,6 +353,13 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				createAST(mypackage);
 			}
 		}
+	}
+	
+	
+	private void getJarMethods() {
+		CompilationUnit unit;
+		
+		
 	}
 
 	
