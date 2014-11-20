@@ -44,12 +44,12 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jface.text.Document;
-
 
 import api.migration.MethodVisitor;
 
@@ -357,10 +357,15 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private void createAST(IPackageFragment mypackage) throws JavaModelException {
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
 			// now create the AST for the ICompilationUnits
-			CompilationUnit parse = parse(unit);
+			CompilationUnit compunit = parse(unit);
+		
+			IProblem[] problems = compunit.getProblems();
+			for (IProblem problem : problems) {
+				System.out.println(problem);
+			}
 			
 			MethodVisitor visitor = new MethodVisitor();
-			parse.accept(visitor);
+			compunit.accept(visitor);
 
 			for (MethodDeclaration method : visitor.getMethods()) {
 				textBox.append("Method name: " + method.getName() + "  Return type: " + method.getReturnType2() + "\n");
