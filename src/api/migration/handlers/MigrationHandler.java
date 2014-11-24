@@ -469,16 +469,18 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	 Code retrieved from: http://www.programcreek.com/2012/06/traverse-jar-file-by-using-eclipse-jdt/
 	 */
 	private void processRootDirectoryJar() throws JavaModelException,CoreException {
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		/*
+		 * IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		System.out.println("root" + root.getLocation().toOSString());
 	 
 		IProject[] projects = root.getProjects();
-	 
+	 */
 		// process each project
-		for (IProject project : projects) {
+	/*	for (IProject project : projects) {
 	 
 			System.out.println("project name: " + project.getName());
-	 
+	 */
+		IProject project= selectedProject;
 			if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
 				IJavaProject javaProject = JavaCore.create(project);
 				IPackageFragment[] packages = javaProject.getPackageFragments();
@@ -556,4 +558,3 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	 
 		}
 	}
-}
