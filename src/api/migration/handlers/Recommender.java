@@ -1,3 +1,4 @@
+package api.migration.handlers;
 
 public class Recommender {
 	public Recommender(String [] oldJarArray, String [] currentJarArray, String [] errorList, int AlgorithmSelection, String filePath){
