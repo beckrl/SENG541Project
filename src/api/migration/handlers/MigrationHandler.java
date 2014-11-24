@@ -35,8 +35,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IInitializer;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -212,6 +216,15 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        	File selectedFile = fileChooser.getSelectedFile();
 	        	newJarPath = selectedFile.getPath();
 	        	System.out.println("New jar path: " + newJarPath);
+				try {
+					processRootDirectoryJar();
+				} catch (JavaModelException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (CoreException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 	        }
 		}
 		
@@ -220,6 +233,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			if ( oldJarChoice.getItemCount() == 1 ) {
 				oldJarPath = oldJarChoice.getItem(0);
 				System.out.println(oldJarPath);
+
 			}
 			
 			if (oldJarPath != null && newJarPath != null) {
@@ -450,4 +464,96 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		}
 	}
 	*/
+	
+	/*Sonny's attend to retrieve jar files within a project
+	 Code retrieved from: http://www.programcreek.com/2012/06/traverse-jar-file-by-using-eclipse-jdt/
+	 */
+	private void processRootDirectoryJar() throws JavaModelException,CoreException {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		System.out.println("root" + root.getLocation().toOSString());
+	 
+		IProject[] projects = root.getProjects();
+	 
+		// process each project
+		for (IProject project : projects) {
+	 
+			System.out.println("project name: " + project.getName());
+	 
+			if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
+				IJavaProject javaProject = JavaCore.create(project);
+				IPackageFragment[] packages = javaProject.getPackageFragments();
+	 
+				// process each package
+				for (IPackageFragment aPackage : packages) {
+	 
+					// We will only look at the package from the source folder
+					// K_BINARY would include also included JARS, e.g. rt.jar
+					// only process the JAR files
+					if (aPackage.getKind() == IPackageFragmentRoot.K_BINARY
+							&& aPackage.getElementName().equals("java.lang")) {
+	 
+						System.out.println("inside of java.lang package");
+	 
+						for (IClassFile classFile : aPackage.getClassFiles()) {
+	 
+							System.out.println("----classFile: "
+									+ classFile.getElementName());
+	 
+							// A class file has a single child of type IType.
+							// Class file elements need to be opened before they
+							// can be navigated. If a class file cannot be
+							// parsed, its structure remains unknown.
+							// Use IJavaElement.isStructureKnown to determine
+							// whether this is the case.
+	 
+							// System.out.println();
+							// classFile.open(null);
+	 
+							for (IJavaElement javaElement : classFile
+									.getChildren()) {
+	 
+								if (javaElement instanceof IType) {
+									System.out.println("--------IType "
+											+ javaElement.getElementName());
+	 
+									// IInitializer
+									IInitializer[] inits = ((IType) javaElement)
+											.getInitializers();
+									for (IInitializer init : inits) {
+										System.out
+												.println("----------------initializer: "
+														+ init.getElementName());
+									}
+	 
+									// IField
+									IField[] fields = ((IType) javaElement)
+											.getFields();
+									for (IField field : fields) {
+										System.out
+												.println("----------------field: "
+														+ field.getElementName());
+									}
+	 
+									// IMethod
+									IMethod[] methods = ((IType) javaElement)
+											.getMethods();
+									for (IMethod method : methods) {
+										System.out
+												.println("----------------method: "
+														+ method.getElementName());
+										System.out
+												.println("----------------method return type - "
+														+ method.getReturnType());
+									}
+								}
+							}
+						}
+	 
+					}
+				}
+	 
+			}
+	 
+		}
+	}
 }
