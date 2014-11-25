@@ -1,20 +1,13 @@
 package api.migration.handlers;
 
 import java.awt.Choice;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -24,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -34,8 +26,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
@@ -43,8 +33,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -64,7 +52,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jface.text.Document;
 
 import api.migration.MethodVisitor;
 
@@ -371,7 +358,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	/*
 	 * Analyse the method calls in Jar file
 	 */
-	//@SuppressWarnings("null")
 	private void analyseJarMethods(IProject project, String jarPath) throws JavaModelException {
 		IPath path = new Path(jarPath);
 		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
@@ -379,6 +365,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			if ( mypackage.getKind() == IPackageFragmentRoot.K_BINARY ) {
 				for ( IClassFile classFile : mypackage.getClassFiles() ) {
 					if( classFile.getPath().toString().equals(path.toString()) ) {
+						System.out.println("Jar path is: " + path.toString());
 						for ( IJavaElement javaElement : classFile.getChildren() ) {
 							if (javaElement instanceof IType) {
 								System.out.println("--------IType " + javaElement.getElementName());
@@ -422,7 +409,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		}
 	}
 
-	
 	
 	/*
 	 * Create AST
