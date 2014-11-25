@@ -126,7 +126,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		// Project selection dropdown menu
 		projectChoice = new Choice();
 		projectChoice.removeAll();
-		projectChoice.setBounds(200, 45, 200, 30);
+		projectChoice.setBounds(200, 45, 400, 30);
 		selectionFrame.getContentPane().add(projectChoice);
 		
 		//Add list of projects to dropdown menu
@@ -136,7 +136,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 						
 		// Old jar selection dropdown menu
 		oldJarChoice = new Choice();
-		oldJarChoice.setBounds(200, 95, 200, 30);
+		oldJarChoice.setBounds(200, 95, 400, 30);
 		selectionFrame.getContentPane().add(oldJarChoice);
 		
 		// Listener for when a project is selected
@@ -190,13 +190,13 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	    	    
 		// Selecting a new jar file button
 	    selectNewJarButton = new JButton("Select Jar File");
-		selectNewJarButton.setBounds(235, 145, 120, 30);
+		selectNewJarButton.setBounds(200, 145, 120, 30);
 		selectionFrame.getContentPane().add(selectNewJarButton);
 		selectNewJarButton.addActionListener(this);
 	    
 		// Migration button
 		migrateButton = new JButton("Migrate");
-		migrateButton.setBounds(150, 210, 150, 30);
+		migrateButton.setBounds(200, 210, 150, 30);
 		selectionFrame.getContentPane().add(migrateButton);
 		migrateButton.addActionListener(this);
 			    				
