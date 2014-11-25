@@ -19,6 +19,7 @@ public class Recommender {
 		outputToFile(filePath, Recommendation);
 	}
 	
+	
 	String [] JarComparisonAlgorithm(String [] oldJarArray, String [] currentJarArray, String [] errorList) {
 		String [] Recommendation = new String[errorList.length];
 		Boolean [] flag = new Boolean[errorList.length];
@@ -34,6 +35,7 @@ public class Recommender {
 		return Recommendation;
 	}
 	
+	
 	String [] EvolvedParametersAlgorithm(String [] currentJarArray, String [] errorList) {
 		String [] Recommendation = new String[errorList.length];
 		
@@ -44,6 +46,7 @@ public class Recommender {
 		
 		return Recommendation;
 	}
+	
 	
 	String [] EvolvedReturnTypeAlgorithm(String [] currentJarArray, String [] errorList) {
 		String [] Recommendation = new String[errorList.length];
@@ -57,7 +60,6 @@ public class Recommender {
 	}
 	
 
-	
 	void outputToFile(String filepath, String [] Recommendation) {
 		//parses list of recommendation and outputs to specified file path
 	}

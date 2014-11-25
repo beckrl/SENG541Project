@@ -1,13 +1,20 @@
 package api.migration.handlers;
 
 import java.awt.Choice;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -26,7 +33,9 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
@@ -182,7 +191,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	    oldJarChoice.addItemListener( new ItemListener() {
 	        public void itemStateChanged(ItemEvent ie)
 	        {
-	        	System.out.println("Im getting printed!!\n\n\n");
 	        	oldJarPath = oldJarChoice.getSelectedItem();
 	        	System.out.println("Old jar path: " + oldJarPath);
 	        }
@@ -219,12 +227,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        if (returnValue == JFileChooser.APPROVE_OPTION) {
 	        	File selectedFile = fileChooser.getSelectedFile();
 	        	newJarPath = selectedFile.getPath();
-				try {
-					processRootDirectoryJar();
-				} catch (CoreException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+	        	System.out.println("New jar path: " + newJarPath);
 	        }
 		}
 		
@@ -244,10 +247,19 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				// Draw the second window showing compilations errors and prompting user for recommendation algorithm
 				drawRecommendationWindow();
 				
-				try { analyseMethods(clonedProject); } 
+				selectionFrame.setVisible(false);
+				
+				// Get method details of old JAR file
+				try { analyseJarMethods(selectedProject, oldJarPath); }
+				catch (JavaModelException e1) { e1.printStackTrace(); }
+
+				// Get method details of new JAR file
+				try { analyseJarMethods(clonedProject, newJarPath); }
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				
-				selectionFrame.setVisible(false);
+				// Get method details and compilation issues of cloned project
+				try { analyseMethods(clonedProject); } 
+				catch (JavaModelException e1) { e1.printStackTrace(); }
 			}
 		}		
 	}
@@ -357,25 +369,60 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 
 	
 	/*
+	 * Analyse the method calls in Jar file
+	 */
+	//@SuppressWarnings("null")
+	private void analyseJarMethods(IProject project, String jarPath) throws JavaModelException {
+		IPath path = new Path(jarPath);
+		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
+		for ( IPackageFragment mypackage : packages ) {
+			if ( mypackage.getKind() == IPackageFragmentRoot.K_BINARY ) {
+				for ( IClassFile classFile : mypackage.getClassFiles() ) {
+					if( classFile.getPath().toString().equals(path.toString()) ) {
+						for ( IJavaElement javaElement : classFile.getChildren() ) {
+							if (javaElement instanceof IType) {
+								System.out.println("--------IType " + javaElement.getElementName());
+ 
+								// IInitializer
+								IInitializer[] inits = ((IType) javaElement).getInitializers();
+								for (IInitializer init : inits) {
+									System.out.println("----------------initializer: " + init.getElementName());
+								}
+ 
+								// IField
+								IField[] fields = ((IType) javaElement).getFields();
+								for (IField field : fields) {
+									System.out.println("----------------field: " + field.getElementName());
+								}
+ 
+								// IMethod
+								IMethod[] methods = ((IType) javaElement).getMethods();
+								for (IMethod method : methods) {
+									System.out.println("----------------method: "+ method.getElementName());
+									System.out.println("----------------method return type - " + method.getReturnType());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+	/*
 	 * Analyse the method calls in project
 	 */
 	private void analyseMethods(IProject project) throws JavaModelException {
 		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
-		// parse(JavaCore.create(project));
 		for (IPackageFragment mypackage : packages) {
 			if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
 				createAST(mypackage);
 			}
 		}
 	}
-	
-	
-	private void getJarMethods() {
-		CompilationUnit unit;
-		
-		
-	}
 
+	
 	
 	/*
 	 * Create AST
@@ -411,30 +458,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		return (CompilationUnit) parser.createAST(null); // parse
 	}
 	
-	
-	/* The following methods are from the online tutorial - don't know if we'll need them
-	private void printProjectInfo(IProject project) throws CoreException, JavaModelException {
-		System.out.println("Working in project " + project.getFullPath());
-		// check if we have a Java project
-		if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-			IJavaProject javaProject = JavaCore.create(project);
-			printPackageInfos(javaProject);
-		}
-	}
-
-	private void printPackageInfos(IJavaProject javaProject) throws JavaModelException {
-		IPackageFragment[] packages = javaProject.getPackageFragments();
-		for (IPackageFragment mypackage : packages) {
-			// Package fragments include all packages in the classpath
-			// We will only look at the package from the source folder
-			// K_BINARY would include also included JARS, e.g. rt.jar
-			if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
-				System.out.println("Package " + mypackage.getElementName());
-				printICompilationUnitInfo(mypackage);
-			}
-		}
-	}
-	
+		
+	/* The following methods are from the online tutorial - don't know if we'll need them	
 	private void printICompilationUnitInfo(IPackageFragment mypackage) throws JavaModelException {
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
 			printCompilationUnitDetails(unit);
@@ -465,9 +490,10 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	}
 	*/
 	
-	/*Sonny's attend to retrieve jar files within a project
-	 Code retrieved from: http://www.programcreek.com/2012/06/traverse-jar-file-by-using-eclipse-jdt/
+	/* Sonny's attend to retrieve jar files within a project
+	 * Code retrieved from: http://www.programcreek.com/2012/06/traverse-jar-file-by-using-eclipse-jdt/
 	 */
+	/*
 	@SuppressWarnings("null")
 	private void processRootDirectoryJar() throws CoreException {
 		IProject project= selectedProject;
@@ -480,6 +506,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			for(IPackageFragment aPackage:packages){
 				if(aPackage.getPath().toString().equals(path.toString())){
 					for (IClassFile classFile : aPackage.getClassFiles()) {
+
 			 			System.out.println("----classFile: "+ classFile.getElementName());
 			 				for (IJavaElement javaElement : classFile.getChildren()) {
 			 					if (javaElement instanceof IType) {
@@ -512,5 +539,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			}
 			
 	 }
-	} 	 
+	}
+	*/ 
 }
+
+
