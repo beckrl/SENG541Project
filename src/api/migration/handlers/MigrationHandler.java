@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
@@ -343,7 +343,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		btnRecommendation.setBounds(100, 320, 159, 29);
 		panel.add(btnRecommendation);
 		
-		/*
 		JRadioButton rdbtnAlgorithm = new JRadioButton("Algorithm 1");
 		rdbtnAlgorithm.setBounds(319, 310, 107, 23);
 		panel.add(rdbtnAlgorithm);
@@ -351,19 +350,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		JRadioButton radioButton = new JRadioButton("Algorithm 2");
 		radioButton.setBounds(319, 330, 107, 23);
 		panel.add(radioButton);
-		*/
-		JCheckBox checkboxAlg1 = new JCheckBox("Algorithm 1");
-		checkboxAlg1.setBounds(319, 310, 107, 23);
-		panel.add(checkboxAlg1);
 		
-		JCheckBox checkboxAlg2 = new JCheckBox("Algorithm 2");
-		checkboxAlg2.setBounds(319, 330, 107, 23);
-		panel.add(checkboxAlg2);
-		frame.setVisible(true);
-		
-		JCheckBox checkboxAlg3 = new JCheckBox("Algorithm 3");
-		checkboxAlg3.setBounds(319, 330, 107, 23);
-		panel.add(checkboxAlg3);
 		frame.setVisible(true);
 	}
 
