@@ -75,6 +75,10 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private JButton migrateButton;
 	private JTextArea textBox;
 	
+	static public int alg1selection=0;
+	static public int alg2selection=0;
+	static public int alg3selection=0;
+	static public String algoritmselection=""; 
 	
 	/* 
 	 * Executes when "API Migration" button is clicked on context menu 
@@ -342,27 +346,64 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		JButton btnRecommendation = new JButton("Recommendation");
 		btnRecommendation.setBounds(100, 325, 159, 29);
 		panel.add(btnRecommendation);
-		/*
-		JRadioButton rdbtnAlgorithm = new JRadioButton("Algorithm 1");
-		rdbtnAlgorithm.setBounds(319, 310, 107, 23);
-		panel.add(rdbtnAlgorithm);
-		
-		JRadioButton radioButton = new JRadioButton("Algorithm 2");
-		radioButton.setBounds(319, 330, 107, 23);
-		panel.add(radioButton);
-		*/
+	
 		JCheckBox checkboxAlg1 = new JCheckBox("Algorithm 1");
 		checkboxAlg1.setBounds(319, 310, 107, 23);
+		checkboxAlg1.addActionListener(new ActionListener() {
+			@Override
+	        public void actionPerformed(ActionEvent e) {
+				alg1selection++;
+				if(alg1selection%2!=0){	
+					algoritmselection+="a";
+					System.out.println("algorithm selection: "+algoritmselection);
+				}
+				else{
+					if(algoritmselection.contains("a")){
+						algoritmselection= algoritmselection.replace("a","");
+					}
+				}
+			}
+	    });
 		panel.add(checkboxAlg1);
 		
 		JCheckBox checkboxAlg2 = new JCheckBox("Algorithm 2");
 		checkboxAlg2.setBounds(319, 330, 107, 23);
+		checkboxAlg2.addActionListener(new ActionListener() {
+			@Override
+	        public void actionPerformed(ActionEvent e) {
+				alg2selection++;
+				if(alg2selection%2!=0){
+					algoritmselection+="b";
+					System.out.println("algorithm selection: "+algoritmselection);
+				}
+				else{
+					if(algoritmselection.contains("b")){
+						algoritmselection= algoritmselection.replace("b","");
+					}
+				}
+			}
+	    });
 		panel.add(checkboxAlg2);
 		
 		JCheckBox checkboxAlg3 = new JCheckBox("Algorithm 3");
 		checkboxAlg3.setBounds(319, 350, 107, 23);
+		checkboxAlg3.addActionListener(new ActionListener() {
+			@Override
+	        public void actionPerformed(ActionEvent e) {
+				alg3selection++;
+				if(alg3selection%2!=0){
+					algoritmselection+="c";
+					System.out.println("algorithm selection: "+algoritmselection);
+				}
+				else{
+					if(algoritmselection.contains("c")){
+						algoritmselection= algoritmselection.replace("c","");
+					}
+				}
+			}
+	    });
 		panel.add(checkboxAlg3);
-				
+		
 		frame.setVisible(true);
 	}
 
