@@ -75,7 +75,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private JFrame selectionFrame;
 	private JButton selectNewJarButton;
 	private JButton migrateButton;
-	private JTextArea textBox;
+	public static JTextArea textBox;
 	
 	//Variables for the algorithm selection
 	static public int alg1selection;
@@ -88,7 +88,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	String [] newJarArray;
 	String [] errorlist;
 	String [] parameterMethodOld;
-	String [] parameterMethodNew;
+	static String [] parameterMethodNew;
 	String [] returnTypeOld;
 	String [] returnTypeNew;
 	Boolean jar;
@@ -425,7 +425,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		btnRecommendation.addActionListener(new ActionListener(){
 			@Override
 		    public void actionPerformed(ActionEvent e) {
-				Recommender.Recommender(oldJarArray, newJarArray, errorlist, algoritmselection, "sonny");
+				Recommender.Recommender(oldJarArray, newJarArray, errorlist, algoritmselection);
 			}	
 		});
 		panel.add(btnRecommendation);
