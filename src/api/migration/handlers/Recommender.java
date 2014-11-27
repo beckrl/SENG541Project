@@ -47,16 +47,16 @@ public class Recommender {
 	//  - Returns an array of Recommendations based on the comparison Algorithm
 	//-----------------------------------------------------------------------------------------------------------------------------------//
 		String [] Recommendation = new String[errorList.length];
-		int [] flag = new int[errorList.length];
+		int [] flag = new int[currentJarArray.length];
 		
-		for(int i = 0; i < errorList.length; i++)
+		for(int i = 0; i < currentJarArray.length; i++)
 			flag[i] = 0;
 		
 		//compares old and currentJarArray by comparing substrings of each other
-		for(int i = 0; i < errorList.length; i++) {
-			for(int j = 0; j < errorList.length; j++) {
+		for(int i = 0; i < oldJarArray.length; i++) {
+			for(int j = 0; j < currentJarArray.length; j++) {
 				//flag each of the currentJarArray for name changes but have same number of parameters
-				if (oldJarArray[i].getElementName().toLowerCase().equals(currentJarArray[j])) {
+				if (oldJarArray[i].getElementName().toLowerCase().equals(currentJarArray[j].getElementName().toLowerCase())) {
 					flag[i]--;
 				} else if (oldJarArray[i].getElementName().toLowerCase().contains(currentJarArray[j].getElementName().toLowerCase()) || 
 							currentJarArray[i].getElementName().toLowerCase().contains(oldJarArray[j].getElementName().toLowerCase())){
@@ -69,7 +69,7 @@ public class Recommender {
 		for(int i = 0; i < errorList.length; i++) {
 			Boolean found = false;
 			
-			for(int j = 0; j < errorList.length; j++) {
+			for(int j = 0; j < currentJarArray.length; j++) {
 				if(flag[j] == 1 && errorList[i].contains(currentJarArray[i].getElementName().toLowerCase())) {
 					found = true;
 					Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[i].getElementName());
