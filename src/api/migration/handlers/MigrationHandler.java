@@ -93,6 +93,10 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	String [] returnTypeNew;
 	Boolean jar;
 	
+	IMethod[] oldJarMethods;
+	IMethod[] newJarMethods;
+	
+	
 	/* 
 	 * Executes when "API Migration" button is clicked on context menu 
 	 */
@@ -468,6 +472,11 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
  
 								// IMethod
 								IMethod[] methods = ((IType) javaElement).getMethods();
+								
+								if (jarPath == oldJarPath)
+									oldJarMethods = methods;
+								else newJarMethods = methods;
+								
 								int methodInt=0;
 								if(!jar){
 									oldJarArray= new String [methods.length];
