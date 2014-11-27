@@ -61,10 +61,10 @@ public class Recommender {
 			for(int j = 0; j < currentJarArray.length; j++) {
 				//flag each of the currentJarArray for name changes but have same number of parameters
 				if (oldJarArray[i].getElementName().toLowerCase().equals(currentJarArray[j].getElementName().toLowerCase())) {
-					flag[i]--;
+					flag[j]--;
 				} else if (oldJarArray[i].getElementName().toLowerCase().contains(currentJarArray[j].getElementName().toLowerCase()) || 
-							currentJarArray[i].getElementName().toLowerCase().contains(oldJarArray[j].getElementName().toLowerCase())){
-					flag[i]++; 
+							currentJarArray[j].getElementName().toLowerCase().contains(oldJarArray[i].getElementName().toLowerCase())){
+					flag[j]++; 
 				}
 			}
 		}
@@ -74,9 +74,9 @@ public class Recommender {
 			Boolean found = false;
 			
 			for(int j = 0; j < currentJarArray.length; j++) {
-				if(flag[j] == 1 && errorList[i].contains(currentJarArray[i].getElementName().toLowerCase())) {
+				if(flag[j] == 1 && errorList[i].contains(currentJarArray[j].getElementName().toLowerCase())) {
 					found = true;
-					Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[i].getElementName());
+					Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[j].getElementName());
 				}
 			}
 			
@@ -101,13 +101,13 @@ public class Recommender {
 		for(int i = 0; i < errorList.length; i++) {
 			for(int j = 0; j < currentJarArray.length; j++) {
 				//for each error in errorList, look for substring function name from currentJarArray
-				if(getMethodName(errorList[i]).toLowerCase().contains(currentJarArray[i].getElementName().toLowerCase()) || 
-					currentJarArray[i].getElementName().toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
+				if(getMethodName(errorList[i]).toLowerCase().contains(currentJarArray[j].getElementName().toLowerCase()) || 
+					currentJarArray[j].getElementName().toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
 						
 						//then look for same parameter type and number of parameters.
 						//make recommendations for each error in errorList
-						if (sameParameters(errorList[i], currentJarArray[i]))
-							Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[i].getElementName());
+						if (sameParameters(errorList[i], currentJarArray[j]))
+							Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[j].getElementName());
 						else
 							Recommendation[i] = recommendationMessage(errorList[i], "");
 					
@@ -129,13 +129,13 @@ public class Recommender {
 		for(int i = 0; i < errorList.length; i++) {
 			for(int j = 0; j < currentJarArray.length; j++) {
 				//for each error in errorList, look for substring function name from currentJarArray
-				if(getMethodName(errorList[i]).toLowerCase().contains(currentJarArray[i].getElementName().toLowerCase()) || 
-					currentJarArray[i].getElementName().toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
+				if(getMethodName(errorList[i]).toLowerCase().contains(currentJarArray[j].getElementName().toLowerCase()) || 
+					currentJarArray[j].getElementName().toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
 						
 						//then look for same return type
 						//make recommendations for each error in errorList
-						if (getReturnType(errorList[i]).toLowerCase().contains(getReturnType(currentJarArray[i].getSignature())))
-								Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[i].getElementName());
+						if (getReturnType(errorList[i]).toLowerCase().contains(getReturnType(currentJarArray[j].getSignature())))
+								Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[j].getElementName());
 						else
 							Recommendation[i] = recommendationMessage(errorList[i], "");
 					
@@ -157,7 +157,7 @@ public class Recommender {
 	//----------------------------------------------------------------------------------------------------------------------------------//
 	
 	static String getMethodName(String method) {
-		String [] parse = method.split("(");
+		String [] parse = method.split("\\(");
 		return parse[0];
 	}
 	
