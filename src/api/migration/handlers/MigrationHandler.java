@@ -81,7 +81,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	static public int alg1selection;
 	static public int alg2selection;
 	static public int alg3selection;
-	static public String algoritmselection; 
+	static public String algorithmSelection; 
 	
 	//Methods retrieved from the jar files
 	String [] oldJarArray;
@@ -344,7 +344,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	public void drawRecommendationWindow() {
 		JFrame frame = new JFrame("API Migrator- Recommendations");
 		JPanel panel = new JPanel();
-		algoritmselection="";
+		algorithmSelection="";
 		alg1selection=0;
 		alg2selection=0;
 		alg3selection=0;
@@ -370,12 +370,12 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e) {
 				alg1selection++;
 				if(alg1selection%2!=0){	
-					algoritmselection+="a";
-					System.out.println("algorithm selection: "+algoritmselection);
+					algorithmSelection+="a";
+					System.out.println("algorithm selection: "+algorithmSelection);
 				}
 				else{
-					if(algoritmselection.contains("a")){
-						algoritmselection= algoritmselection.replace("a","");
+					if(algorithmSelection.contains("a")){
+						algorithmSelection= algorithmSelection.replace("a","");
 					}
 				}
 			}
@@ -389,12 +389,12 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e) {
 				alg2selection++;
 				if(alg2selection%2!=0){
-					algoritmselection+="b";
-					System.out.println("algorithm selection: "+algoritmselection);
+					algorithmSelection+="b";
+					System.out.println("algorithm selection: "+algorithmSelection);
 				}
 				else{
-					if(algoritmselection.contains("b")){
-						algoritmselection= algoritmselection.replace("b","");
+					if(algorithmSelection.contains("b")){
+						algorithmSelection= algorithmSelection.replace("b","");
 					}
 				}
 			}
@@ -408,12 +408,12 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e) {
 				alg3selection++;
 				if(alg3selection%2!=0){
-					algoritmselection+="c";
-					System.out.println("algorithm selection: "+algoritmselection);
+					algorithmSelection+="c";
+					System.out.println("algorithm selection: "+algorithmSelection);
 				}
 				else{
-					if(algoritmselection.contains("c")){
-						algoritmselection= algoritmselection.replace("c","");
+					if(algorithmSelection.contains("c")){
+						algorithmSelection= algorithmSelection.replace("c","");
 					}
 				}
 			}
@@ -425,7 +425,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		btnRecommendation.addActionListener(new ActionListener(){
 			@Override
 		    public void actionPerformed(ActionEvent e) {
-				Recommender.Recommender(oldJarArray, newJarArray, errorlist, algoritmselection);
+				//Recommender.Recommender(oldJarArray, newJarArray, errorlist, algorithmSelection);
+				Recommender heuristics = new Recommender(oldJarArray, newJarArray, errorlist, algorithmSelection);
+				heuristics.outputRecommendation(algorithmSelection);
 			}	
 		});
 		panel.add(btnRecommendation);
