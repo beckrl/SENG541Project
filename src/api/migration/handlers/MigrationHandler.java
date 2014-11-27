@@ -430,7 +430,12 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			@Override
 		    public void actionPerformed(ActionEvent e) {
 				//Recommender.Recommender(oldJarArray, newJarArray, errorlist, algorithmSelection);
-				Recommender heuristics = new Recommender(oldJarArray, newJarArray, errorlist, algorithmSelection);
+				Recommender heuristics = null;
+				try {
+					heuristics = new Recommender(oldJarMethods, newJarMethods, errorlist, algorithmSelection);
+				} catch (JavaModelException e1) {
+					e1.printStackTrace();
+				}
 				heuristics.outputRecommendation(algorithmSelection);
 			}	
 		});
