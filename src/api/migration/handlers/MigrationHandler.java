@@ -435,6 +435,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				} catch (JavaModelException e1) {
 					e1.printStackTrace();
 				}
+				textBox.setText("");
 				heuristics.outputRecommendation(algorithmSelection);
 			}	
 		});
