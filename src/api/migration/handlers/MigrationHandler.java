@@ -429,7 +429,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		btnRecommendation.addActionListener(new ActionListener(){
 			@Override
 		    public void actionPerformed(ActionEvent e) {
-				//Recommender.Recommender(oldJarArray, newJarArray, errorlist, algorithmSelection);
 				Recommender heuristics = null;
 				try {
 					heuristics = new Recommender(oldJarMethods, newJarMethods, errorlist, algorithmSelection);

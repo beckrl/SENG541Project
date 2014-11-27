@@ -9,7 +9,7 @@ public class Recommender {
 	private String [] Recommendation3;
 	private Boolean parsed;
 	
-	public Recommender(IMethod [] oldJarArray, IMethod [] currentJarArray, String [] errorList, String AlgorithmSelection, String filePath) throws JavaModelException{
+	public Recommender(IMethod [] oldJarArray, IMethod [] currentJarArray, String [] errorList, String AlgorithmSelection) throws JavaModelException{
 	//-----------------------------------------------------------------------------------------------------------------------------------//
 	//	 - Based on AlgorithmSelections, create recommendations
 	//	 - Initializes each Recommendation array to the size of the errorList
