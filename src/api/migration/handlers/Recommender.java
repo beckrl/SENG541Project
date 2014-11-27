@@ -160,5 +160,11 @@ public class Recommender {
 	void outputToFile(String [] Recommendation1, String [] Recommendation2, String [] Recommendation3, String filepath) {
 		//parses list of recommendation and outputs to specified file path
 	}
+
+	public static void Recommender(String[] oldJarArray, String[] newJarArray,
+			String[] errorlist, String algoritmselection, String string) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
