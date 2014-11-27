@@ -162,11 +162,15 @@ public class Recommender {
 	}
 	
 	static String [] getParameters(String method) {
-		String [] split = method.split("(");
+		String [] split = method.split("\\(");
 		String temp = split[1];
-		split = temp.split(")");
+		split = temp.split("\\)");
 		temp = split[0];
-		split = temp.split(",");
+		
+		if(temp.contains(";"))
+			split = temp.split(";");
+		else
+			split = temp.split(", ");
 		
 		return split;
 	}
@@ -188,9 +192,10 @@ public class Recommender {
 	
 	static String getReturnType(String ReturnType) {
 		String [] split = ReturnType.split("/");
+		String [] temp = ReturnType.split("\\)");
 		
-		if(split.length == 0)
-			return ReturnType;
+		if(split.length == 1)
+			return temp[1];
 		else
 			return split[split.length - 1];
 	}
@@ -210,9 +215,9 @@ public class Recommender {
 		for(int i = 3; i < parse.length; i++)
 			temp += parse[i] + " ";
 	
-		parse = temp.split(")");
+		parse = temp.split("\\)");
 		
-		return parse[0];
+		return parse[0] + ")";
 	}
 	
 	static String recommendationMessage(String errorMethod, String methodReplacement) {
