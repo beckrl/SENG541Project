@@ -26,7 +26,7 @@ public class Recommender {
 			String [] parse = errorList[i].split("\\s+");
 			
 			if (ValidError(parse[0])) 
-				errorList[i] = parse[3];
+				errorList[i] = getErrorMethod(errorList[i]);
 			else 
 				errorList[i] = "*ignore*";
 		}
