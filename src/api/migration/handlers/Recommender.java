@@ -24,7 +24,11 @@ public class Recommender {
 		//parse for the method name and parameters of each errors in the list
 		for(int i = 0; i < errorList.length; i++) {
 			String [] parse = errorList[i].split("\\s+");
-			errorList[i] = parse[3];
+			
+			if (ValidError(parse[0])) 
+				errorList[i] = parse[3];
+			else 
+				errorList[i] = "*ignore*";
 		}
 		
 		//calls each of the heuristic recommendations depending on the Algorithm Selections
@@ -148,6 +152,7 @@ public class Recommender {
 	//	  - getParameters (gets the error in the errorList and returns a string array of all its parameters)
 	// 	  - sameParameters(gets the error in the List and the IMethod of currentJar; returns a true or false if the parameters match)
 	//	  - getReturnType (gets the return type of the error in the List or from the IMethod currentJar .getSigniture() string)
+	//	  - validError    (gets the errorType and returns true or false whether the errorType is supported for recommendation)
 	//	  - recommendationMessage (gets the errorMethod and the recommendedMethod; Returns the appropriate recommendation message based on recommendationMethod string)
 	//----------------------------------------------------------------------------------------------------------------------------------//
 	
@@ -190,8 +195,30 @@ public class Recommender {
 			return split[split.length - 1];
 	}
 	
+	static Boolean ValidError(String errorType) {
+		if (errorType.equals("Pb(100)") || errorType.equals("Pb(103)") 
+		 || errorType.equals("Pb(115)")|| errorType.equals("Pb(133)")) {
+			return true;
+		} else 
+			return false;
+	}
+	
+	static String getErrorMethod(String errorMessage) {
+		String [] parse = errorMessage.split("\\s+");
+		String temp = "";
+		
+		for(int i = 3; i < parse.length; i++)
+			temp += parse[i] + " ";
+	
+		parse = temp.split(")");
+		
+		return parse[0];
+	}
+	
 	static String recommendationMessage(String errorMethod, String methodReplacement) {
-		if (methodReplacement.equals(""))
+		if (errorMethod.equals("*ignore*"))
+			return "No recommendations supported for this error Type";
+		else if(methodReplacement.equals(""))
 			return "No recommendations found to solve issue compilation issue with " + getMethodName(errorMethod) + ".";
 		else
 			return "Recommendation: Replace " + getMethodName(errorMethod) + " with " + methodReplacement + ".";
@@ -205,16 +232,33 @@ public class Recommender {
 		//parses list of recommendation and outputs to specified file path
 		if (parsed) {
 			if (AlgorithmSelection.contains("a")) {
+				MigrationHandler.textBox.append("Recommendation 1: Jar Comparsion Algorthim\n");
+				MigrationHandler.textBox.append("------------------------------------------\n");
+				
 				for(int i = 0; i < Recommendation1.length; i++)
 					MigrationHandler.textBox.append(Recommendation1[i] + "\n");
+				
+				MigrationHandler.textBox.append("------------------------------------------\n\n");
 			}
+			
 			if (AlgorithmSelection.contains("b")) {
+				MigrationHandler.textBox.append("Recommendation 2: Name and Parameter Algorthim\n");
+				MigrationHandler.textBox.append("------------------------------------------\n");
+				
 				for(int i = 0; i < Recommendation1.length; i++)
 					MigrationHandler.textBox.append(Recommendation2[i] + "\n");
+				
+				MigrationHandler.textBox.append("------------------------------------------\n\n");
 			}
+			
 			if (AlgorithmSelection.contains("c")) {
+				MigrationHandler.textBox.append("Recommendation 3: Name and Return Type Algorthim\n");
+				MigrationHandler.textBox.append("------------------------------------------\n");
+				
 				for(int i = 0; i < Recommendation1.length; i++)
-					MigrationHandler.textBox.append(Recommendation3[i] + "\n");
+					MigrationHandler.textBox.append(Recommendation1[i] + "\n");
+				
+				MigrationHandler.textBox.append("------------------------------------------\n\n");
 			}
 		}
 	}
