@@ -77,6 +77,7 @@ public class Recommender {
 				if(flag[j] == 1 && errorList[i].contains(currentJarArray[j].getElementName().toLowerCase())) {
 					found = true;
 					Recommendation[i] = recommendationMessage(errorList[i], currentJarArray[j].getElementName());
+					break;
 				}
 			}
 			
@@ -96,6 +97,7 @@ public class Recommender {
 	//  - Returns an array of Recommendations based on the Parameters Algorithm
 	//-----------------------------------------------------------------------------------------------------------------------------------//
 		String [] Recommendation = new String[errorList.length];
+		Boolean found = false;
 		
 		//compares errorList with currentJarArray
 		for(int i = 0; i < errorList.length; i++) {
@@ -103,7 +105,8 @@ public class Recommender {
 				//for each error in errorList, look for substring function name from currentJarArray
 				if(getMethodName(errorList[i]).toLowerCase().contains(currentJarArray[j].getElementName().toLowerCase()) || 
 					currentJarArray[j].getElementName().toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
-						
+						found = true;
+					
 						//then look for same parameter type and number of parameters.
 						//make recommendations for each error in errorList
 						if (sameParameters(errorList[i], currentJarArray[j]))
@@ -113,6 +116,11 @@ public class Recommender {
 					
 				}
 			}
+			
+			if(!found){
+				Recommendation[i] = recommendationMessage(errorList[i], "");
+			} else found = false;
+				
 		}
 		
 		return Recommendation;
@@ -125,13 +133,15 @@ public class Recommender {
 	//  - Returns an array of Recommendations based on the Return Type Algorithm
 	//-----------------------------------------------------------------------------------------------------------------------------------//
 		String [] Recommendation = new String[errorList.length];
+		Boolean found = false;
 		
 		for(int i = 0; i < errorList.length; i++) {
 			for(int j = 0; j < currentJarArray.length; j++) {
 				//for each error in errorList, look for substring function name from currentJarArray
 				if(getMethodName(errorList[i]).toLowerCase().contains(currentJarArray[j].getElementName().toLowerCase()) || 
 					currentJarArray[j].getElementName().toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
-						
+						found = true;
+					
 						//then look for same return type
 						//make recommendations for each error in errorList
 						if (getReturnType(errorList[i]).toLowerCase().contains(getReturnType(currentJarArray[j].getSignature())))
@@ -141,6 +151,10 @@ public class Recommender {
 					
 				}
 			}
+			
+			if(!found){
+				Recommendation[i] = recommendationMessage(errorList[i], "");
+			} else found = false;
 		}
 		
 		return Recommendation;
