@@ -84,18 +84,21 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	static public String algorithmSelection; 
 	
 	//Methods retrieved from the jar files
-	String [] oldJarArray;
-	String [] newJarArray;
+	static String [] oldJarArray;
+	static String [] newJarArray;
 	String [] errorlist;
-	String [] parameterMethodOld;
-	static String [] parameterMethodNew;
-	String [] returnTypeOld;
-	String [] returnTypeNew;
+	static String [][] parameterMethodOld;
+	static String [][] parameterMethodNew;
+	static String [] returnTypeOld;
+	static String [] returnTypeNew;
 	Boolean jar;
 	
 	IMethod[] oldJarMethods;
 	IMethod[] newJarMethods;
 	
+	int oldMethodInt;
+	int currentMethodInt;	
+	int methodInt;
 	
 	/* 
 	 * Executes when "API Migration" button is clicked on context menu 
@@ -259,13 +262,28 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				selectionFrame.setVisible(false);
 				
 				// Get method details of old JAR file
-				try { analyseJarMethods(selectedProject, oldJarPath); }
+				try { 
+					oldMethodInt= GetNumberMethods(selectedProject, oldJarPath);
+					oldJarArray= new String[oldMethodInt];
+					parameterMethodOld= new String[oldMethodInt][];
+					returnTypeOld= new String[oldMethodInt];
+					methodInt=0;
+					analyseJarMethods(selectedProject, oldJarPath);
+					System.out.println("old jar has this many methods: "+methodInt);
+					}
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 
 				// Get method details of new JAR file
 				try {
-					jar=!jar; 
-					analyseJarMethods(clonedProject, newJarPath); }
+					currentMethodInt= GetNumberMethods(clonedProject, newJarPath);
+					newJarArray= new String[currentMethodInt];
+					parameterMethodNew= new String[currentMethodInt][];
+					returnTypeNew= new String[currentMethodInt];
+					jar=!jar;
+					methodInt=0;
+					analyseJarMethods(clonedProject, newJarPath); 
+					System.out.println("the current jar has this many methods: "+methodInt);
+					}
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				
 				// Get method details and compilation issues of cloned project
@@ -458,7 +476,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 						if(!jar)
 							textBox.append("The path for the old .jar file is: "+ path.toString());
 						else
-							textBox.append("\n\n===========================================================\nThe path for the new .jar file is: "+ path.toString());
+							textBox.append("\n\n===========================================================\n"
+									+ "The path for the new .jar file is: "+ path.toString());
 						for ( IJavaElement javaElement : classFile.getChildren() ) {
 							if (javaElement instanceof IType) {
 								textBox.append("\n-The name of the selected jar's class is: "+javaElement.getElementName());
@@ -482,22 +501,13 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 									oldJarMethods = methods;
 								else newJarMethods = methods;
 								
-								int methodInt=0;
-								if(!jar){
-									oldJarArray= new String [methods.length];
-									returnTypeOld= new String[methods.length];
-								}
-								else{
-									newJarArray= new String [methods.length];
-									returnTypeNew= new String [methods.length];
-								}
 								for (IMethod method : methods) {
 									if(!jar){
 										oldJarArray[methodInt]= method.getElementName();
 										textBox.append("\n* Old method name: " + oldJarArray[methodInt]);
 										returnTypeOld[methodInt]= method.getReturnType();
 										textBox.append("\n   ** Old method return type: " + returnTypeOld[methodInt]);
-										parameterMethodOld= method.getParameterTypes();
+										parameterMethodOld[methodInt]= method.getParameterTypes();
 										for(int i=0; i<parameterMethodOld.length;i++)
 											textBox.append("\n     *** Method " + oldJarArray[methodInt]+" "+ i+"th argument type is: "+parameterMethodOld[i]);
 									}
@@ -506,7 +516,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 										textBox.append("\n* New method name: " + newJarArray[methodInt]);
 										returnTypeNew[methodInt]= method.getReturnType();
 										textBox.append("\n   ** New method return type: " + returnTypeNew[methodInt]);
-										parameterMethodNew= method.getParameterTypes();
+										parameterMethodNew[methodInt]= method.getParameterTypes();
 										for(int i=0; i<parameterMethodNew.length;i++)
 											textBox.append("\n     *** Method " + newJarArray[methodInt]+" "+ i+"th argument type is: "+parameterMethodNew[i]);
 									}
@@ -571,7 +581,31 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		parser.setResolveBindings(true);
 		return (CompilationUnit) parser.createAST(null); // parse
 	}
+	
+	private int GetNumberMethods(IProject project, String jarPath) throws JavaModelException{
+		int numberMethods=0;	
+		IPath path = new Path(jarPath);
+		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
+		for ( IPackageFragment mypackage : packages ) {
+			if ( mypackage.getKind() == IPackageFragmentRoot.K_BINARY ) {
+				for ( IClassFile classFile : mypackage.getClassFiles() ) {
+					if( classFile.getPath().toString().equals(path.toString()) ) {
+						for ( IJavaElement javaElement : classFile.getChildren() ) {
+							if (javaElement instanceof IType) {
+								// IMethod
+								IMethod[] methods = ((IType) javaElement).getMethods();
+								for (IMethod method : methods) {
+									numberMethods++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return numberMethods;
 		
+	}
 	/* The following methods are from the online tutorial - don't know if we'll need them	
 	private void printICompilationUnitInfo(IPackageFragment mypackage) throws JavaModelException {
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {

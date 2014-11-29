@@ -1,5 +1,7 @@
 package api.migration.handlers;
 
+import java.util.Arrays;
+
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 
@@ -7,6 +9,9 @@ public class Recommender {
 	private String [] Recommendation1; 
 	private String [] Recommendation2; 
 	private String [] Recommendation3;
+	private String sonnyRecommends1;
+	private String sonnyRecommends2;
+	private String sonnyRecommends3;
 	private Boolean parsed;
 	
 	public Recommender(IMethod [] oldJarArray, IMethod [] currentJarArray, String [] errorList, String AlgorithmSelection) throws JavaModelException{
@@ -20,7 +25,9 @@ public class Recommender {
 		Recommendation1 = new String[errorList.length];
 		Recommendation2 = new String[errorList.length];
 		Recommendation3 = new String[errorList.length];
-		
+		sonnyRecommends1="";	
+		sonnyRecommends2="";
+		sonnyRecommends3="";
 		//parse for the method name and parameters of each errors in the list
 		for(int i = 0; i < errorList.length; i++) {
 			String [] parse = errorList[i].split("\\s+");
@@ -33,15 +40,43 @@ public class Recommender {
 		
 		//calls each of the heuristic recommendations depending on the Algorithm Selections
 		if(AlgorithmSelection.contains("a"))
-			Recommendation1 = JarComparisonAlgorithm(oldJarArray, currentJarArray, errorList);
-		
+			//Recommendation1 = JarComparisonAlgorithm(oldJarArray, currentJarArray, errorList);
+			sonnyRecommends1= jarComparisonAlgorithmSonny(oldJarArray, currentJarArray, errorList);
 		if(AlgorithmSelection.contains("b"))
-			Recommendation2 = EvolvedParametersAlgorithm(currentJarArray, errorList);
-			
+			//Recommendation2 = EvolvedParametersAlgorithm(currentJarArray, errorList);
+			sonnyRecommends2= evolvedParametersAlgorithmSonny(currentJarArray, errorList);
 		if(AlgorithmSelection.contains("c"))
-			Recommendation3 = EvolvedReturnTypeAlgorithm(currentJarArray, errorList);
-		
+			//Recommendation3 = EvolvedReturnTypeAlgorithm(currentJarArray, errorList);
+			sonnyRecommends3= evolvedReturnTypeAlgorithmSonny(currentJarArray, errorList);
 		parsed = true;
+	}
+	
+	String jarComparisonAlgorithmSonny(IMethod [] oldJarArray, IMethod [] currentJarArray, String [] errorList) {
+	//-----------------------------------------------------------------------------------------------------------------------------------//
+	//  - Takes in the IMethod array of the old and current jar files and compares them based on substrings
+	//  - Any notable changes are flagged and are used to determine the recommendation for each error in the List
+	//  - Returns an array of Recommendations based on the comparison Algorithm
+	//-----------------------------------------------------------------------------------------------------------------------------------//
+		//String[] Recommendation = new String[errorList.length];
+		String Recommendation="";
+		int errorNumb=1;
+		for (int oldJar= 0; oldJar< MigrationHandler.oldJarArray.length; oldJar++){
+			for (int currentJar=0; currentJar<MigrationHandler.newJarArray.length; currentJar++){
+				if(MigrationHandler.oldJarArray[oldJar].equals(MigrationHandler.newJarArray[currentJar])){
+					currentJar=MigrationHandler.newJarArray.length-1;	//goes to the next value to check, the previous element is found
+				}
+				else if ((MigrationHandler.oldJarArray[oldJar].compareTo(MigrationHandler.newJarArray[currentJar])!=0 ) && 
+						(currentJar==(MigrationHandler.newJarArray.length-1)))
+				{
+					Recommendation+= "Error Number["+errorNumb+"] \n"
+					+ "The method: "+ MigrationHandler.oldJarArray[oldJar]+" is currently not being implemented in the new project,\n "
+					+ "most likely it was renamed or discard, please make sure the logic of the project is not affected anyhow.\n";
+					errorNumb++;
+				}
+			}	
+		}
+		
+		return Recommendation;
 	}
 	
 	String [] JarComparisonAlgorithm(IMethod [] oldJarArray, IMethod [] currentJarArray, String [] errorList) {
@@ -50,7 +85,9 @@ public class Recommender {
 	//  - Any notable changes are flagged and are used to determine the recommendation for each error in the List
 	//  - Returns an array of Recommendations based on the comparison Algorithm
 	//-----------------------------------------------------------------------------------------------------------------------------------//
-		String [] Recommendation = new String[errorList.length];
+		String[] Recommendation = new String[errorList.length];
+
+		
 		int [] flag = new int[currentJarArray.length];
 		
 		for(int i = 0; i < currentJarArray.length; i++)
@@ -90,6 +127,42 @@ public class Recommender {
 		return Recommendation;
 	}
 	
+	String evolvedParametersAlgorithmSonny(IMethod [] currentJarArray, String [] errorList) throws JavaModelException {
+		//-----------------------------------------------------------------------------------------------------------------------------------//
+		//  - Takes in the IMethod array of the current jar and the errorList and compares them based on substring and number of parameters
+		//  - Any matching substring as well as number and type of parameters are recommended
+		//  - Returns an array of Recommendations based on the Parameters Algorithm
+		//-----------------------------------------------------------------------------------------------------------------------------------//
+		String Recommendation="";
+		int errorNumb=1;
+		for (int oldJar= 0; oldJar< MigrationHandler.oldJarArray.length; oldJar++){
+			for (int currentJar=0; currentJar<MigrationHandler.newJarArray.length; currentJar++){
+				if(MigrationHandler.oldJarArray[oldJar].equals(MigrationHandler.newJarArray[currentJar])){
+					if(MigrationHandler.parameterMethodOld[oldJar].length!=MigrationHandler.parameterMethodNew[currentJar].length){
+						Recommendation+= "Error Number["+errorNumb+"]\n"
+						+ "The method: "+ MigrationHandler.oldJarArray[oldJar]+" currently doesn't have matching number of arguments with its "
+						+ "identical named method within the new project. Please verify this is not affecting anyhow the logic of the project.\n";
+						errorNumb++;
+					}
+					else{
+						for(int arg=0; arg<MigrationHandler.parameterMethodOld[oldJar].length; arg++){
+							if(MigrationHandler.parameterMethodOld[oldJar][arg].compareTo(MigrationHandler.parameterMethodNew[currentJar][arg])!=0){
+								Recommendation+= "Error Number["+errorNumb+"] \n"
+								+ "The method: "+ MigrationHandler.oldJarArray[oldJar]+" currently doesn't have matching arguments type with its identical\n"
+								+ "named method within the new project. Please verify this is not affecting anyhow the logic of the project.\n"
+								+ "The argument "+arg+" is the one causing the problem.\n";
+								errorNumb++;
+							}
+						}
+					}
+					
+				}
+			}	
+		}
+
+		return Recommendation;
+	}
+	
 	String [] EvolvedParametersAlgorithm(IMethod [] currentJarArray, String [] errorList) throws JavaModelException {
 	//-----------------------------------------------------------------------------------------------------------------------------------//
 	//  - Takes in the IMethod array of the current jar and the errorList and compares them based on substring and number of parameters
@@ -123,6 +196,30 @@ public class Recommender {
 				
 		}
 		
+		return Recommendation;
+	}
+
+	String evolvedReturnTypeAlgorithmSonny(IMethod [] currentJarArray, String [] errorList) throws JavaModelException {
+	//-----------------------------------------------------------------------------------------------------------------------------------//
+	//  - Takes in the IMethod array of the current jar and the errorList and compares them based on substring and return type
+	//  - Any matching substring as well as return types are recommended
+	//  - Returns an array of Recommendations based on the Return Type Algorithm
+	//-----------------------------------------------------------------------------------------------------------------------------------//
+		String Recommendation = "";
+		int errorNumb=1;
+		for (int oldJar= 0; oldJar< MigrationHandler.oldJarArray.length; oldJar++){
+			for (int currentJar=0; currentJar<MigrationHandler.newJarArray.length; currentJar++){
+				if(MigrationHandler.oldJarArray[oldJar].equals(MigrationHandler.newJarArray[currentJar])){
+					if(MigrationHandler.returnTypeOld[oldJar].compareTo(MigrationHandler.returnTypeNew[currentJar])!=0){
+						Recommendation+= "Error Number["+errorNumb+"] \n"
+						+ "The method: "+ MigrationHandler.oldJarArray[oldJar]+" currently doesn't have matching return type with its identical\n"
+						+ "named method within the new project. Please verify this is not affecting anyhow the logic of the project.\n";
+						errorNumb++;
+					}
+					
+				}
+			}	
+		}	
 		return Recommendation;
 	}
 	
@@ -239,6 +336,9 @@ public class Recommender {
 			return "No recommendations supported for this error Type";
 		else if(methodReplacement.equals(""))
 			return "No recommendations found to solve issue compilation issue with " + getMethodName(errorMethod) + ".";
+		else if(errorMethod.equals("MethodNotFound")){
+			return "The method: "+methodReplacement+"is not longer available within the new project, make sure the system is not implementing it.";
+		}
 		else
 			return "Recommendation: Replace " + getMethodName(errorMethod) + " with " + methodReplacement + ".";
 	}
@@ -251,32 +351,35 @@ public class Recommender {
 		//parses list of recommendation and outputs to specified file path
 		if (parsed) {
 			if (AlgorithmSelection.contains("a")) {
-				MigrationHandler.textBox.append("Recommendation 1: Jar Comparsion Algorthim\n");
+				MigrationHandler.textBox.append("Recommendation 1: Jar Comparison Algorthim\n");
 				MigrationHandler.textBox.append("------------------------------------------\n");
-				
+				/*
 				for(int i = 0; i < Recommendation1.length; i++)
-					MigrationHandler.textBox.append(Recommendation1[i] + "\n");
-				
+					MigrationHandler.textBox.append(Recommendation1 + "\n");
+				*/
+				MigrationHandler.textBox.append(sonnyRecommends1);
 				MigrationHandler.textBox.append("------------------------------------------\n\n");
 			}
 			
 			if (AlgorithmSelection.contains("b")) {
 				MigrationHandler.textBox.append("Recommendation 2: Name and Parameter Algorthim\n");
 				MigrationHandler.textBox.append("------------------------------------------\n");
-				
+				/*
 				for(int i = 0; i < Recommendation1.length; i++)
 					MigrationHandler.textBox.append(Recommendation2[i] + "\n");
-				
+				*/
+				MigrationHandler.textBox.append(sonnyRecommends2);
 				MigrationHandler.textBox.append("------------------------------------------\n\n");
 			}
 			
 			if (AlgorithmSelection.contains("c")) {
 				MigrationHandler.textBox.append("Recommendation 3: Name and Return Type Algorthim\n");
 				MigrationHandler.textBox.append("------------------------------------------\n");
-				
+				/*
 				for(int i = 0; i < Recommendation1.length; i++)
 					MigrationHandler.textBox.append(Recommendation1[i] + "\n");
-				
+				*/
+				MigrationHandler.textBox.append(sonnyRecommends3);
 				MigrationHandler.textBox.append("------------------------------------------\n\n");
 			}
 		}
@@ -284,143 +387,4 @@ public class Recommender {
 //-----------------------------------------------------------------------------------------------------------------------------------//
 // My Code Ends Here
 //-----------------------------------------------------------------------------------------------------------------------------------//
-	
-//	public static void Recommender(String[] oldJarArray, String[] newJarArray,
-//		String[] errorlist, String algorithmselection) {
-//		String [] Recommendation1 = new String[errorlist.length];
-//		String [] Recommendation2 = new String[errorlist.length];
-//		String [] Recommendation3 = new String[errorlist.length];
-//		
-//		//parse for the method name of each error in the list
-//		for(int i = 0; i < errorlist.length; i++) {
-//			String [] parse = errorlist[i].split("\\s+");
-//			errorlist[i] = parse[3];
-//		}
-//		
-//		if(algorithmselection.contains("a"))
-//		//	Recommendation1 = jarComparisonAlgorithm(oldJarArray, newJarArray, errorlist);
-//		if(algorithmselection.contains("b"))
-//		//	Recommendation2 = evolvedParametersAlgorithm(newJarArray, errorlist);
-//		if(algorithmselection.contains("c"))
-//		//	Recommendation3 = evolvedReturnTypeAlgorithm(newJarArray, errorlist);
-//		
-//		//outputToFile(Recommendation1, Recommendation2, Recommendation3);
-//	}
-//
-//	private static String[] evolvedReturnTypeAlgorithm(String[] newJarArray,
-//			String[] errorList) {
-//		String [] Recommendation = new String[errorList.length];
-//		
-//		for(int i = 0; i < errorList.length; i++) {
-//			for(int j = 0; j < newJarArray.length; j++) {
-//				//for each error in errorList, look for substring function name from currentJarArray
-//				if(getMethodName(errorList[i]).toLowerCase().contains(newJarArray[i].toLowerCase()) || 
-//					newJarArray[i].toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
-//						
-//						//then look for same return type
-//						//make recommendations for each error in errorList
-//						if (getReturnType(errorList[i]).toLowerCase().contains(getReturnType(MigrationHandler.parameterMethodNew[i])))
-//								Recommendation[i] = "Recommendation: Replace " + getMethodName(errorList[i]) + " with " + newJarArray + "";
-//						else
-//							Recommendation[i] = "No recommendations found to solve issue complilation issue with " + getMethodName(errorList[i]);
-//					
-//				}
-//			}
-//		}
-//		
-//		return Recommendation;
-//	}
-//
-//	private static String[] evolvedParametersAlgorithm(String[] newJarArray,
-//			String[] errorList) {
-//		String [] Recommendation = new String[errorList.length];
-//		
-//		//compares errorList with currentJarArray
-//		for(int i = 0; i < errorList.length; i++) {
-//			for(int j = 0; j < newJarArray.length; j++) {
-//				//for each error in errorList, look for substring function name from currentJarArray
-//				if(getMethodName(errorList[i]).toLowerCase().contains(newJarArray[i].toLowerCase()) || 
-//					newJarArray[i].toLowerCase().contains(getMethodName(errorList[i]).toLowerCase())) {
-//						
-//						//then look for same parameter type and number of parameters.
-//						//make recommendations for each error in errorList
-//						if (SameParameters(errorList[i], newJarArray[i]))
-//								Recommendation[i] = "Recommendation: Replace " + getMethodName(errorList[i]) + " with " + newJarArray[i] + "";
-//						else
-//							Recommendation[i] = "No recommendations found to solve issue complilation issue with " + getMethodName(errorList[i]);
-//					
-//				}
-//			}
-//		}
-//		
-//		return Recommendation;
-//	}
-//
-//	private static boolean SameParameters(String errorMethod, String cjMethod) {
-//		String [] emParameters = getParameters(errorMethod);
-//		String [] cjParameters = getParameters(cjMethod);
-//		
-//		if(emParameters.length != cjParameters.length)
-//			return false;
-//		
-//		for (int i = 0; i < emParameters.length; i++) {
-//			if(!emParameters[i].toLowerCase().equals(cjParameters[i]))
-//				return false;
-//		}
-//		
-//		return true;
-//	}
-//
-//	private static String[] jarComparisonAlgorithm(String[] oldJarArray,
-//			String[] newJarArray, String[] errorList) {
-//		String [] Recommendation = new String[errorList.length];
-//		int [] flag = new int[errorList.length];
-//		
-//		for(int i = 0; i < errorList.length; i++)
-//			flag[i] = 0;
-//		
-//		//compares old and currentJarArray by comparing substrings of each other
-//		for(int i = 0; i < errorList.length; i++) {
-//			for(int j = 0; j < errorList.length; j++) {
-//				//flag each of the currentJarArray for name changes but have same number of parameters
-//				if (oldJarArray[i].toLowerCase().equals(newJarArray[j])) {
-//					flag[i]--;
-//				} else if (oldJarArray[i].toLowerCase().contains(newJarArray[j].toLowerCase()) || 
-//							newJarArray[i].toLowerCase().contains(oldJarArray[j].toLowerCase())){
-//					flag[i]++; 
-//				}
-//			}
-//		}
-//		
-//		//for each error in errorList, use the flagged items in currentJArArray to provide recommendations
-//		for(int i = 0; i < errorList.length; i++) {
-//			Boolean found = false;
-//			
-//			for(int j = 0; j < errorList.length; j++) {
-//			
-//				if(flag[j] == 1 && errorList[i].contains(newJarArray[i].toLowerCase())) {
-//					found = true;
-//					Recommendation[i] = "Recommendation: Replace " + getMethodName(errorList[i]) + " with " + newJarArray[i] + "";
-//				}
-//				
-//			}
-//			
-//			if(!found)
-//				Recommendation[i] = "No recommendations found to solve issue complilation issue with " + getMethodName(errorList[i]);
-//			else
-//				found = false; // reset
-//		}
-//			
-//		return Recommendation;
-//	}
-//	
-//	public void ErrorFinder(String []errorList){
-//		String error1= "The import "+ " cannot be resolved";
-//		String error2= "The method is undenfined for the type";
-//		
-//		for(int i=0; i<errorList.length; i++){
-//			//if(errorList[i].con)
-//		}
-//	}
-	
 }
