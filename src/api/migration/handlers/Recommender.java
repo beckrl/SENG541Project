@@ -105,24 +105,6 @@ public class Recommender {
 				}
 			}
 		}
-				
-		System.out.println("currentJarArray all;");
-		for (int i =0; i < currentJarArray.length; i++)
-		{
-			System.out.println(currentJarArray[i].getElementName());
-		}
-		System.out.println("\ncurrentJarArray flag = 0;");
-		for (int i =0; i < currentJarArray.length; i++)
-		{
-			if(flag[i] == 0)
-				System.out.println(currentJarArray[i].getElementName());
-		}
-		System.out.println("\ncurrentJarArray flag = 1;");
-		for (int i =0; i < currentJarArray.length; i++)
-		{
-			if(flag[i] == 1)
-				System.out.println(currentJarArray[i].getElementName());
-		}
 		
 		//for each error in errorList, use the flagged items in currentJArArray to provide recommendations
 		for(int i = 0; i < errorList.length; i++) {

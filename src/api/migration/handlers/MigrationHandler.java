@@ -25,7 +25,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -77,9 +76,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private JButton selectNewJarButton;
 	private JButton migrateButton;
 	public static JTextArea textBox;
-	
-	private int oldCounter = 0;
-	private int newCounter = 0;
 	
 	//Variables for the algorithm selection
 	static public int alg1selection;
@@ -501,25 +497,12 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 								// IMethod
 								IMethod[] methods = ((IType) javaElement).getMethods();
 								
-								if (jarPath == oldJarPath) {
-									if(oldCounter == 0)
-										oldJarMethods = methods;
-									else
-										oldJarMethods = (IMethod[]) ArrayUtils.addAll(oldJarMethods, methods);
-									
-									oldCounter++;
-								}
-								else { 
-									if(newCounter == 0)
-										newJarMethods = methods;
-									else
-										newJarMethods = (IMethod[]) ArrayUtils.addAll(newJarMethods, methods);
-									
-									newCounter++;
-								}
+								if (jarPath == oldJarPath)
+									oldJarMethods = methods;
+								else newJarMethods = methods;
 								
 								for (IMethod method : methods) {
-/*									if(!jar){
+									if(!jar){
 										oldJarArray[methodInt]= method.getElementName();
 										textBox.append("\n* Old method name: " + oldJarArray[methodInt]);
 										returnTypeOld[methodInt]= method.getReturnType();
@@ -537,7 +520,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 										for(int i=0; i<parameterMethodNew.length;i++)
 											textBox.append("\n     *** Method " + newJarArray[methodInt]+" "+ i+"th argument type is: "+parameterMethodNew[i]);
 									}
-									methodInt++;*/
+									methodInt++;
 								}
 							}
 						}
