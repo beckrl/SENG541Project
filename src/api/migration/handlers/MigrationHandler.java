@@ -385,8 +385,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		scrollPane.setBounds(30, 30, 540, 270);
 		panel.add(scrollPane);
 				
-		JCheckBox checkboxAlg1 = new JCheckBox("Algorithm 1");
-		checkboxAlg1.setBounds(319, 310, 107, 23);
+		JCheckBox checkboxAlg1 = new JCheckBox("Jar Comparison");
+		checkboxAlg1.setBounds(319, 310, 200, 23);
 		checkboxAlg1.addActionListener(new ActionListener() {
 			@Override
 	        public void actionPerformed(ActionEvent e) {
@@ -404,8 +404,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	    });
 		panel.add(checkboxAlg1);
 		
-		JCheckBox checkboxAlg2 = new JCheckBox("Algorithm 2");
-		checkboxAlg2.setBounds(319, 330, 107, 23);
+		JCheckBox checkboxAlg2 = new JCheckBox("Return Types Comparison");
+		checkboxAlg2.setBounds(319, 330, 200, 23);
 		checkboxAlg2.addActionListener(new ActionListener() {
 			@Override
 	        public void actionPerformed(ActionEvent e) {
@@ -423,8 +423,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	    });
 		panel.add(checkboxAlg2);
 		
-		JCheckBox checkboxAlg3 = new JCheckBox("Algorithm 3");
-		checkboxAlg3.setBounds(319, 350, 107, 23);
+		JCheckBox checkboxAlg3 = new JCheckBox("Parameters comparison");
+		checkboxAlg3.setBounds(319, 350, 200, 23);
 		checkboxAlg3.addActionListener(new ActionListener() {
 			@Override
 	        public void actionPerformed(ActionEvent e) {
