@@ -78,23 +78,14 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private JButton migrateButton;
 	public static JTextArea textBox;
 	
-	private int oldCounter = 0;
-	private int newCounter = 0;
-	
 	//Variables for the algorithm selection
 	static public int alg1selection;
 	static public int alg2selection;
 	static public int alg3selection;
 	static public String algorithmSelection; 
 	
-	//Methods retrieved from the jar files
-	static String [] oldJarArray;
-	static String [] newJarArray;
 	String [] errorlist;
-	static String [][] parameterMethodOld;
-	static String [][] parameterMethodNew;
-	static String [] returnTypeOld;
-	static String [] returnTypeNew;
+	
 	Boolean jar;
 	
 	IMethod[] oldJarMethods;
@@ -103,6 +94,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	int oldMethodInt;
 	int currentMethodInt;	
 	int methodInt;
+	int counter;
+
 	
 	/* 
 	 * Executes when "API Migration" button is clicked on context menu 
@@ -207,7 +200,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        public void itemStateChanged(ItemEvent ie)
 	        {
 	        	oldJarPath = oldJarChoice.getSelectedItem();
-	        	System.out.println("Old jar path: " + oldJarPath);
+	        	System.out.println("The old jar path is: " + oldJarPath);
 	        }
 	    });
 	    	    
@@ -243,7 +236,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	        if (returnValue == JFileChooser.APPROVE_OPTION) {
 	        	File selectedFile = fileChooser.getSelectedFile();
 	        	newJarPath = selectedFile.getPath();
-	        	System.out.println("New jar path: " + newJarPath);
+	        	System.out.println("The new jar path is: " + newJarPath);
 	        }
 		}
 		
@@ -251,8 +244,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		if (e.getSource() == migrateButton) {
 			if ( oldJarChoice.getItemCount() == 1 ) {
 				oldJarPath = oldJarChoice.getItem(0);
-				System.out.println(oldJarPath);
-
 			}
 			
 			if (oldJarPath != null && newJarPath != null) {
@@ -268,31 +259,35 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				// Get method details of old JAR file
 				try { 
 					oldMethodInt= GetNumberMethods(selectedProject, oldJarPath);
-					oldJarArray= new String[oldMethodInt];
-					parameterMethodOld= new String[oldMethodInt][];
-					returnTypeOld= new String[oldMethodInt];
 					methodInt=0;
+					oldJarMethods= new IMethod[oldMethodInt]; 
+					counter=0;
 					analyseJarMethods(selectedProject, oldJarPath);
-					System.out.println("old jar has this many methods: "+methodInt);
-					}
+					System.out.println("\nThe old jar has this many methods: " + oldMethodInt);
+					for (IMethod method : oldJarMethods) { System.out.println( method.getElementName() ); }
+				}
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 
 				// Get method details of new JAR file
 				try {
 					currentMethodInt= GetNumberMethods(clonedProject, newJarPath);
-					newJarArray= new String[currentMethodInt];
-					parameterMethodNew= new String[currentMethodInt][];
-					returnTypeNew= new String[currentMethodInt];
 					jar=!jar;
 					methodInt=0;
+					counter=0;
+					newJarMethods= new IMethod[currentMethodInt];
 					analyseJarMethods(clonedProject, newJarPath); 
-					System.out.println("the current jar has this many methods: "+methodInt);
-					}
+					System.out.println("\nThe new jar has this many methods: " + currentMethodInt);
+					for (IMethod method : newJarMethods) { System.out.println( method.getElementName() ); }
+				}
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				
 				// Get method details and compilation issues of cloned project
 				try { analyseMethods(clonedProject); } 
 				catch (JavaModelException e1) { e1.printStackTrace(); }
+				
+				// Print the list of problems in the new project
+				System.out.println("\nThe list of IProblems in the new project:");
+				for(String error : errorlist) { System.out.println(error); }
 			}
 		}		
 	}
@@ -389,8 +384,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		scrollPane.setBounds(30, 30, 540, 270);
 		panel.add(scrollPane);
 				
-		JCheckBox checkboxAlg1 = new JCheckBox("Algorithm 1");
-		checkboxAlg1.setBounds(319, 310, 107, 23);
+		JCheckBox checkboxAlg1 = new JCheckBox("JAR File Comparison");
+		checkboxAlg1.setBounds(319, 310, 200, 23);
 		checkboxAlg1.addActionListener(new ActionListener() {
 			@Override
 	        public void actionPerformed(ActionEvent e) {
@@ -408,8 +403,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	    });
 		panel.add(checkboxAlg1);
 		
-		JCheckBox checkboxAlg2 = new JCheckBox("Algorithm 2");
-		checkboxAlg2.setBounds(319, 330, 107, 23);
+		JCheckBox checkboxAlg2 = new JCheckBox("Return Type Comparison");
+		checkboxAlg2.setBounds(319, 330, 200, 23);
 		checkboxAlg2.addActionListener(new ActionListener() {
 			@Override
 	        public void actionPerformed(ActionEvent e) {
@@ -427,8 +422,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	    });
 		panel.add(checkboxAlg2);
 		
-		JCheckBox checkboxAlg3 = new JCheckBox("Algorithm 3");
-		checkboxAlg3.setBounds(319, 350, 107, 23);
+		JCheckBox checkboxAlg3 = new JCheckBox("Paramter Comparison");
+		checkboxAlg3.setBounds(319, 350, 200, 23);
 		checkboxAlg3.addActionListener(new ActionListener() {
 			@Override
 	        public void actionPerformed(ActionEvent e) {
@@ -451,14 +446,15 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		btnRecommendation.addActionListener(new ActionListener(){
 			@Override
 		    public void actionPerformed(ActionEvent e) {
+				/*				
 				Recommender heuristics = null;
 				try {
 					heuristics = new Recommender(oldJarMethods, newJarMethods, errorlist, algorithmSelection);
 				} catch (JavaModelException e1) {
 					e1.printStackTrace();
 				}
-				textBox.setText("");
 				heuristics.outputRecommendation(algorithmSelection);
+				*/
 			}	
 		});
 		panel.add(btnRecommendation);
@@ -473,71 +469,24 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private void analyseJarMethods(IProject project, String jarPath) throws JavaModelException {
 		IPath path = new Path(jarPath);
 		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
+		Boolean jarVersion;
+		counter=0;
 		for ( IPackageFragment mypackage : packages ) {
 			if ( mypackage.getKind() == IPackageFragmentRoot.K_BINARY ) {
 				for ( IClassFile classFile : mypackage.getClassFiles() ) {
 					if( classFile.getPath().toString().equals(path.toString()) ) {
-						if(!jar)
-							textBox.append("The path for the old .jar file is: "+ path.toString());
-						else
-							textBox.append("\n\n===========================================================\n"
-									+ "The path for the new .jar file is: "+ path.toString());
 						for ( IJavaElement javaElement : classFile.getChildren() ) {
-							if (javaElement instanceof IType) {
-								textBox.append("\n-The name of the selected jar's class is: "+javaElement.getElementName());
-
-								// IInitializer
-								IInitializer[] inits = ((IType) javaElement).getInitializers();
-								for (IInitializer init : inits) {
-									textBox.append("\n* The element that initilizes this class is: "+init.getElementName());
-								}
- 
-								// IField
-								IField[] fields = ((IType) javaElement).getFields();
-								for (IField field : fields) {
-									textBox.append("\n* The field of this class is: "+ field.getElementName());
-								}
- 
+							if (javaElement instanceof IType) {								
 								// IMethod
 								IMethod[] methods = ((IType) javaElement).getMethods();
-								
-								if (jarPath == oldJarPath) {
-									if(oldCounter == 0)
-										oldJarMethods = methods;
-									else
-										oldJarMethods = (IMethod[]) ArrayUtils.addAll(oldJarMethods, methods);
-									
-									oldCounter++;
-								}
-								else { 
-									if(newCounter == 0)
-										newJarMethods = methods;
-									else
-										newJarMethods = (IMethod[]) ArrayUtils.addAll(newJarMethods, methods);
-									
-									newCounter++;
-								}
-								
-								for (IMethod method : methods) {
-/*									if(!jar){
-										oldJarArray[methodInt]= method.getElementName();
-										textBox.append("\n* Old method name: " + oldJarArray[methodInt]);
-										returnTypeOld[methodInt]= method.getReturnType();
-										textBox.append("\n   ** Old method return type: " + returnTypeOld[methodInt]);
-										parameterMethodOld[methodInt]= method.getParameterTypes();
-										for(int i=0; i<parameterMethodOld.length;i++)
-											textBox.append("\n     *** Method " + oldJarArray[methodInt]+" "+ i+"th argument type is: "+parameterMethodOld[i]);
+								for (int intmethod=0; intmethod<methods.length; intmethod++) {
+									if(jarPath == oldJarPath){
+										oldJarMethods[counter]= methods[intmethod];
 									}
 									else{
-										newJarArray[methodInt]= method.getElementName();
-										textBox.append("\n* New method name: " + newJarArray[methodInt]);
-										returnTypeNew[methodInt]= method.getReturnType();
-										textBox.append("\n   ** New method return type: " + returnTypeNew[methodInt]);
-										parameterMethodNew[methodInt]= method.getParameterTypes();
-										for(int i=0; i<parameterMethodNew.length;i++)
-											textBox.append("\n     *** Method " + newJarArray[methodInt]+" "+ i+"th argument type is: "+parameterMethodNew[i]);
+										newJarMethods[counter]= methods[intmethod];
 									}
-									methodInt++;*/
+									counter++;
 								}
 							}
 						}
@@ -565,25 +514,31 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	 * Create AST
 	 */
 	private void createAST(IPackageFragment mypackage) throws JavaModelException {
+		int errorNum=0;
+		
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
 			// now create the AST for the ICompilationUnits
 			CompilationUnit compunit = parse(unit);
 		
 			IProblem[] problems = compunit.getProblems();
-			int errorNum=0;
-			errorlist= new String [problems.length];
-			for (IProblem problem : problems) {
-				errorlist[errorNum]= problem.toString();
-				System.out.println(errorlist[errorNum]);
-				errorNum++;
-			}
-			
+			errorNum+=problems.length;
 			MethodVisitor visitor = new MethodVisitor();
 			compunit.accept(visitor);
-/*
-			for (MethodDeclaration method : visitor.getMethods()) {
-				textBox.append("Method name: " + method.getName() + "  Return type: " + method.getReturnType2() + "\n");
-			}*/
+		}
+		
+		errorlist= new String[errorNum];
+		errorNum=0;
+		
+		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
+			// now create the AST for the ICompilationUnits
+			CompilationUnit compunit = parse(unit);
+		
+			IProblem[] problems = compunit.getProblems();
+			
+			for (IProblem problem : problems) {
+				errorlist[errorNum]= problem.toString();
+				errorNum++;
+			}
 		}
 	}
 	
@@ -599,6 +554,10 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		return (CompilationUnit) parser.createAST(null); // parse
 	}
 	
+	
+	/*
+	 * Returns the number of methods in a JAR file
+	 */
 	private int GetNumberMethods(IProject project, String jarPath) throws JavaModelException{
 		int numberMethods=0;	
 		IPath path = new Path(jarPath);
@@ -621,90 +580,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			}
 		}
 		return numberMethods;
-		
 	}
-	/* The following methods are from the online tutorial - don't know if we'll need them	
-	private void printICompilationUnitInfo(IPackageFragment mypackage) throws JavaModelException {
-		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-			printCompilationUnitDetails(unit);
-		}
-	}
-
-	private void printIMethods(ICompilationUnit unit) throws JavaModelException {
-		IType[] allTypes = unit.getAllTypes();
-		for (IType type : allTypes) {
-			printIMethodDetails(type);
-		}
-	}
-
-	private void printCompilationUnitDetails(ICompilationUnit unit) throws JavaModelException {
-		System.out.println("Source file " + unit.getElementName());
-		Document doc = new Document(unit.getSource());
-		System.out.println("Has number of lines: " + doc.getNumberOfLines());
-		printIMethods(unit);
-	}
-
-	private void printIMethodDetails(IType type) throws JavaModelException {
-		IMethod[] methods = type.getMethods();
-		for (IMethod method : methods) {
-			System.out.println("Method name " + method.getElementName());
-			System.out.println("Signature " + method.getSignature());
-			System.out.println("Return Type " + method.getReturnType());
-		}
-	}
-	*/
 	
-	/* Sonny's attend to retrieve jar files within a project
-	 * Code retrieved from: http://www.programcreek.com/2012/06/traverse-jar-file-by-using-eclipse-jdt/
-	 */
-	/*
-	@SuppressWarnings("null")
-	private void processRootDirectoryJar() throws CoreException {
-		IProject project= selectedProject;
-		IJavaProject targetProject=null;
-		String oldJarPathNoJAR= oldJarPath.substring(0, oldJarPath.lastIndexOf('.'));
-		IPath path = new Path(oldJarPath);
-		if (project.hasNature(JavaCore.NATURE_ID)) {
-			targetProject= JavaCore.create(project);
-			IPackageFragment[] packages = targetProject.getPackageFragments();
-			for(IPackageFragment aPackage:packages){
-				if(aPackage.getPath().toString().equals(path.toString())){
-					for (IClassFile classFile : aPackage.getClassFiles()) {
-
-			 			System.out.println("----classFile: "+ classFile.getElementName());
-			 				for (IJavaElement javaElement : classFile.getChildren()) {
-			 					if (javaElement instanceof IType) {
-									System.out.println("--------IType "
-									+ javaElement.getElementName());
-									// IInitializer
-									IInitializer[] inits = ((IType) javaElement).getInitializers();
-									for (IInitializer init : inits) {
-										System.out.println("----------------initializer: "
-																+ init.getElementName());
-									}
-			 						// IField
-									IField[] fields = ((IType) javaElement).getFields();
-									for (IField field : fields) {
-										System.out.println("----------------field: "
-																+ field.getElementName());
-									}
-			 						// IMethod
-									IMethod[] methods = ((IType) javaElement).getMethods();
-									for (IMethod method : methods) {
-										System.out.println("----------------method: "
-																+ method.getElementName());
-										System.out.println("----------------method return type - "
-																+ method.getReturnType());
-									}
-			 					}
-			 				}
-					}
-				}
-			}
-			
-	 }
-	}
-	*/ 
-}
-
-
+}	// end of program tag
