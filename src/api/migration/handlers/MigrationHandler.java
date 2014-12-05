@@ -73,9 +73,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private JButton migrateButton;
 	public static JTextArea textBox;
 	
-	private List<String> errorList = new ArrayList<String>();
-	private List<IMethod> oldJarMethods = new ArrayList<IMethod>();
-	private List<IMethod> newJarMethods = new ArrayList<IMethod>();
+	private List<String> errorList;
+	private List<IMethod> oldJarMethods;
+	private List<IMethod> newJarMethods;
 	
 	// Variables for the algorithm selection
 	static public int alg1selection;
@@ -243,14 +243,17 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				selectionFrame.setVisible(false);
 				
 				// Get method details of old JAR file
+				oldJarMethods = new ArrayList<IMethod>();
 				try { analyseJarMethods(selectedProject, oldJarPath); }
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 
 				// Get method details of new JAR file
+				newJarMethods = new ArrayList<IMethod>();
 				try { analyseJarMethods(clonedProject, newJarPath); }
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				
 				// Get the compilation issues from the new project
+				errorList = new ArrayList<String>();
 				try { analyseMethods(clonedProject); } 
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				

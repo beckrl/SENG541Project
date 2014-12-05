@@ -8,10 +8,10 @@ import org.eclipse.jdt.core.IMethod;
 public class Recommender {
 
 	// Class Variables
-	private List<IMethod> changedMethods = new ArrayList<IMethod>();
-	private List<String> nameRecommendations = new ArrayList<String>();
-	private List<String> parameterRecommendations = new ArrayList<String>();
-	private List<String> returnTypeRecommendations = new ArrayList<String>();
+	private List<IMethod> changedMethods;
+	private List<String> nameRecommendations;
+	private List<String> parameterRecommendations;
+	private List<String> returnTypeRecommendations;
 	
 	
 	/*
@@ -21,6 +21,7 @@ public class Recommender {
 		
 		// Compare all methods in new Jar with old Jar.
 		// Any methods that are new or have been modified since the old Jar are added to changedMethods list.
+		changedMethods = new ArrayList<IMethod>();
 		for(int i=0; i < newJarMethods.size(); i++) {
 			Boolean found = false;
 			for(int j=0; j < oldJarMethods.size(); j++) {
@@ -40,6 +41,10 @@ public class Recommender {
 	 * Executes the selected algorithms
 	 */
 	public void executeAlgorithms(List<IMethod> newJarMethods, List<String> errorList, String algorithmSelection) {
+		nameRecommendations = new ArrayList<String>();
+		parameterRecommendations = new ArrayList<String>();
+		returnTypeRecommendations = new ArrayList<String>();
+		
 		if( algorithmSelection.contains("a") ) {	
 			nameComparisonAlgorithm(newJarMethods, errorList);
 		}
