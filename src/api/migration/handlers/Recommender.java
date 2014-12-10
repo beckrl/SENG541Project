@@ -12,6 +12,7 @@ public class Recommender {
 
 	// Class Variables
 	private List<IMethod> changedMethods;
+	private List<IMethod> problemMethods;
 	
 	//variables storing recommendations when method's name is being analyze 
 	private List<String> nameRecommendations;
@@ -28,6 +29,22 @@ public class Recommender {
 	 * Constructor
 	 */
 	public Recommender(List<IMethod> oldJarMethods, List<IMethod> newJarMethods, List<String> errorList) {
+		// Maps each IProblem to an equivalent IMethod inside oldJarMethods and add to problemMethods list
+		problemMethods = new ArrayList<IMethod>();
+		for(String message : errorList) {
+			String problemName = getProblemMethodName(message);
+			String[] problemParameters = getProblemParameters(message);
+			
+			for(IMethod method : oldJarMethods) {
+				if( problemName.equals(method.getElementName()) ) {
+					if( problemParameters.length == method.getNumberOfParameters() ) {
+						problemMethods.add(method);
+					}
+				}
+			}
+		}
+		
+		System.out.println("Number of elements in problemMethods: " + problemMethods.size());
 		
 		// Compare all methods in new Jar with old Jar.
 		// Any methods that are new or have been modified since the old Jar are added to changedMethods list.
@@ -133,7 +150,7 @@ public class Recommender {
 		return_parameterRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			return_parameterRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			return_parameterRecommendations.add("Recommendation(s):\n");
 			
@@ -221,7 +238,7 @@ public class Recommender {
 		name_parameterRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			name_parameterRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			name_parameterRecommendations.add("Recommendation(s):\n");
 			
@@ -276,7 +293,7 @@ public class Recommender {
 		name_returnRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			name_returnRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			name_returnRecommendations.add("Recommendation(s):\n");
 			
@@ -332,7 +349,7 @@ public class Recommender {
 		name_parameter_returnRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			name_parameter_returnRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			name_parameter_returnRecommendations.add("Recommendation(s):\n");
 			
@@ -507,7 +524,7 @@ public class Recommender {
 		nameRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			nameRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			nameRecommendations.add("Recommendation(s):\n");
 			
@@ -547,7 +564,7 @@ public class Recommender {
 		parameterRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			parameterRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			parameterRecommendations.add("Recommendation(s):\n");
 			
@@ -627,7 +644,7 @@ public class Recommender {
 		returnTypeRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
+			String errorMethodName = getProblemMethodName( errorList.get(i) );
 			returnTypeRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
 			returnTypeRecommendations.add("Recommendation(s):\n");
 			returnTypeRecommendations.add("Since IProblem doesn't provide return types, by myself I can't do much.\n"
@@ -643,7 +660,7 @@ public class Recommender {
 	 * 		The method setDate(int) from the type Date is deprecated -> setDate
 	 *		The method getDate() is undefined for the type MyClass -> getDate
 	 */
-	static String getErrorMethodName(String errorMessage) {
+	static String getProblemMethodName(String errorMessage) {
 		String [] parse = errorMessage.split("\\s+");
 		String temp = "";
 		
@@ -653,5 +670,38 @@ public class Recommender {
 		parse = temp.split("\\)");
 		
 		return parse[0].split("\\(")[0];
+	}
+	
+	
+	/*
+	 * Returns a String array of the parameter types in an IProblem message
+	 */
+	static String[] getProblemParameters(String message) {
+		String[] split = message.split("\\(");
+		String temp = split[1];
+		split = temp.split("\\)");
+		temp = split[0];
+		split = temp.split(", ");
+		
+		if( split.length == 1 && message.contains("()") ) {
+			return new String[0];
+		}
+		else {
+			return split;
+		}
+	}
+	
+	
+	/*
+	 * Returns the shortened parameter type for an Imethod parameter
+	 * Example: Ljava.lang.String; returns String
+	 */
+	static String parseParameter(String parameter) {
+		String[] tmp = parameter.split("\\.");
+	
+		String result = tmp[tmp.length-1];
+		result = result.replace(";", "");
+	
+		return result;
 	}
 }
