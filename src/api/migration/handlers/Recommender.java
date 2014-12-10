@@ -659,7 +659,9 @@ public class Recommender {
 		recommendations.add("Return Type Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("If no recommendations can be found, it is likely that the method name or parameters have changed.\n");
-		recommendations.add("Consider using more heuristics to see if better recommendations can be made.\n\n");
+		recommendations.add("Consider using more heuristics to see if better recommendations can be made.\n");
+		recommendations.add("Keep in mind that often when only a return type is changed, the issue is often a type mismatch.\n");
+		recommendations.add("Often the answer might be to change the types in your code and not an actual method replacement.\n\n");
 		
 		for(IMethod problem : problemMethods) {
 			String problemName = problem.getElementName();
