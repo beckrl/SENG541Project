@@ -259,10 +259,11 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				try { analyseMethods(clonedProject); } 
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				
+				// Printing information to the Eclipse console
+				printInfoToConsole();
+				
 				// Create the recommender
 				recommender = new Recommender(oldJarMethods, newJarMethods, errorList, textBox);
-				
-				printInfoToConsole();
 			}
 		}		
 	}

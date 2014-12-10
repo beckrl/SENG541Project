@@ -26,7 +26,7 @@ public class Recommender {
 			String[] problemParameters = getProblemParameters(message);
 			
 			for(IMethod method : oldJarMethods) {
-				if( problemName.equals(method.getElementName()) ) {
+				if( problemName.equals(method.getElementName()) ) {				
 					if( problemParameters.length == method.getNumberOfParameters() ) {
 						problemMethods.add(method);
 					}
@@ -118,7 +118,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.equals(newMethodName) ){
@@ -232,7 +232,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.contains(newMethodName) || newMethodName.contains(problemName) ){
@@ -316,7 +316,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.contains(newMethodName) || newMethodName.contains(problemName) ){
@@ -398,7 +398,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.contains(newMethodName) || newMethodName.contains(problemName) ){
@@ -490,7 +490,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.contains(newMethodName) || newMethodName.contains(problemName) ){
@@ -561,7 +561,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.equals(newMethodName) ){
@@ -574,7 +574,6 @@ public class Recommender {
 			
 			if(match == false) {
 				recommendations.add("No recommendations could be determined.\n");
-				recommendations.add("It is likely the name or return type have changed.\n");
 			}
 		}
 		
@@ -668,7 +667,7 @@ public class Recommender {
 			recommendations.add("\nError in Method:            " + printMethodInfo(problem) + "\n");
 			recommendations.add("Recommendation(s):\n");
 			
-			Boolean match = false;
+			boolean match = false;
 			for(IMethod method : newJarMethods) {
 				String newMethodName = method.getElementName();
 				if( problemName.equals(newMethodName) ){
@@ -737,7 +736,7 @@ public class Recommender {
 		temp = split[0];
 		split = temp.split(", ");
 		
-		if( split.length == 1 && message.contains("()") ) {
+		if( split.length == 1 && split[0].equals("") ) {
 			return new String[0];
 		}
 		else {
