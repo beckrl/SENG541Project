@@ -354,7 +354,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		scrollPane.setBounds(30, 30, 540, 270);
 		panel.add(scrollPane);
 				
-		JCheckBox checkboxAlg1 = new JCheckBox("JAR File Comparison");
+		JCheckBox checkboxAlg1 = new JCheckBox("Name Comparison");
 		checkboxAlg1.setBounds(319, 310, 200, 23);
 		checkboxAlg1.addActionListener(new ActionListener() {
 			@Override
