@@ -77,6 +77,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 	private List<IMethod> oldJarMethods;
 	private List<IMethod> newJarMethods;
 	
+	private Recommender recommender;
+	
 	// Variables for the algorithm selection
 	static public int alg1selection;
 	static public int alg2selection;
@@ -257,6 +259,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				try { analyseMethods(clonedProject); } 
 				catch (JavaModelException e1) { e1.printStackTrace(); }
 				
+				// Create the recommender
+				recommender = new Recommender(oldJarMethods, newJarMethods, errorList, textBox);
+				
 				printInfoToConsole();
 			}
 		}		
@@ -350,7 +355,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 		
 		textBox = new JTextArea();
 		textBox.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(textBox, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		textBox.setLineWrap(true);
+		textBox.setWrapStyleWord(true);
+		JScrollPane scrollPane = new JScrollPane(textBox, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(30, 30, 540, 270);
 		panel.add(scrollPane);
 				
@@ -418,7 +425,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				textBox.setText("");
 				
 				// Invokes the recommender class
-				Recommender recommender = new Recommender(oldJarMethods, newJarMethods, errorList);
 				try {
 					recommender.executeAlgorithms(newJarMethods, oldJarMethods, errorList, algorithmSelection);
 				} catch (JavaModelException e1) {
