@@ -419,8 +419,8 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				
 				// Invokes the recommender class
 				Recommender recommender = new Recommender(oldJarMethods, newJarMethods, errorList);
-				recommender.executeAlgorithms(newJarMethods, errorList, algorithmSelection);
-				recommender.printRecommendations(algorithmSelection);
+				recommender.executeAlgorithms(newJarMethods, oldJarMethods, errorList, algorithmSelection);
+				recommender.printRecommendations(algorithmSelection, textBox);
 				
 				// Move the caret of the textbox back to the top once everything is printed
 				textBox.setCaretPosition(0);
