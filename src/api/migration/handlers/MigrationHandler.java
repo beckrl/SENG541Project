@@ -422,7 +422,6 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				try {
 					recommender.executeAlgorithms(newJarMethods, oldJarMethods, errorList, algorithmSelection);
 				} catch (JavaModelException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				recommender.printRecommendations(algorithmSelection, textBox);

@@ -77,18 +77,6 @@ public class Recommender {
 		returnTypeRecommendations= new ArrayList<String>();
 		parameterRecommendations= new ArrayList<String>();
 		
-		/*
-		if( algorithmSelection.contains("a") ) {	
-			nameComparisonAlgorithm(newJarMethods, errorList);
-		}
-		
-		if( algorithmSelection.contains("b") ) {
-			parameterComparisonAlgorithm(newJarMethods, errorList);
-		}
-		
-		if( algorithmSelection.contains("c") ) {
-			returnTypeComparisonAlgorithm(newJarMethods, errorList);
-		}*/
 		if (algorithmSelection.contains("a")){
 			/*
 			 * Analyze cases where the name of the missing methods are given as hint, it should provide
@@ -141,8 +129,11 @@ public class Recommender {
 			}
 		}
 	}
+
 	
-	
+	/*
+	 * 
+	 */
 	private void parameter_returnComparison(List<IMethod> newJarMethods, List<IMethod> oldJarMethods,
 			List<String> errorList) throws JavaModelException {
 		return_parameterRecommendations.add("----------------------------------------------------------\n");
@@ -231,6 +222,9 @@ public class Recommender {
 	}
 
 
+	/*
+	 * 
+	 */
 	private void name_parameterComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, 
 			List<String> errorList) {
 		name_parameterRecommendations.add("----------------------------------------------------------\n");
@@ -286,6 +280,9 @@ public class Recommender {
 	}
 
 
+	/*
+	 * 
+	 */
 	private void name_returnComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods,
 			List<String> errorList) throws JavaModelException {
 		name_returnRecommendations.add("----------------------------------------------------------\n");
@@ -342,6 +339,9 @@ public class Recommender {
 	}
 
 
+	/*
+	 * 
+	 */
 	private void name_parameter_returnComaprisonAlgorithm(List<IMethod> newJarMethods, List <IMethod> oldJarMethods, 
 			List<String> errorList) throws JavaModelException {
 		name_parameter_returnRecommendations.add("----------------------------------------------------------\n");
@@ -409,26 +409,7 @@ public class Recommender {
 	/*
 	 * Prints recommendations to the textBox in the second pop-up window
 	 */
-	public void printRecommendations(String algorithmSelection, JTextArea textbox) {
-		/*
-		if( algorithmSelection.contains("a") ) {
-			for(String line : nameRecommendations) {
-				MigrationHandler.textBox.append(line);
-			}
-		}
-
-		if( algorithmSelection.contains("b") ) {
-			for(String line : parameterRecommendations) {
-				MigrationHandler.textBox.append(line);
-			}
-		}
-
-		if( algorithmSelection.contains("c") ) {
-			for(String line : returnTypeRecommendations) {
-				MigrationHandler.textBox.append(line);
-			}
-		}*/
-		
+	public void printRecommendations(String algorithmSelection, JTextArea textbox) {		
 		if(algorithmSelection.contains("a")){
 			if(algorithmSelection.contains("b")){
 				if(algorithmSelection.contains("c")){
@@ -489,35 +470,8 @@ public class Recommender {
 	
 	
 	/*
-	 * For each IProblem, check if its method name is a substring of a method in the new Jar.
-	 * Also do the reverse check, check if the name of jar methods are a substring of the error method name.
-	 * Examples: 
-	 * 		Will work:
-	 * 			Error: printHello 			NewJar: printHelloWorld
-	 * 			Error: printGreeting		NewJar: print
-	 * 		Won't work:
-	 * 			Error: printHello			NewJar: printGreeting
-	 * 			Error: printHelloWorld		NewJar: printWorld
+	 * 
 	 */
-	/*
-	public void nameComparisonAlgorithm(List<IMethod> newJarMethods, List<String> errorList) {
-		nameRecommendations.add("----------------------------------------------------------\n");
-		nameRecommendations.add("Name Comparison Recommendations\n");
-		nameRecommendations.add("----------------------------------------------------------\n");
-		
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getErrorMethodName( errorList.get(i) );
-			nameRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			nameRecommendations.add("Recommendation(s):\n");
-			
-			for(int j=0; j < newJarMethods.size(); j++) {
-				if( errorMethodName.contains(newJarMethods.get(j).getElementName()) || newJarMethods.get(j).getElementName().contains(errorMethodName) ) {
-					nameRecommendations.add( newJarMethods.get(j).getElementName() + "\n" );
-				}
-			}
-		}
-	}
-	*/
 	public void nameComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) {
 		nameRecommendations.add("----------------------------------------------------------\n");
 		nameRecommendations.add("Name Comparison Recommendations\n");
@@ -554,7 +508,9 @@ public class Recommender {
 				}
 			}
 		}
-	}	
+	}
+	
+	
 	/*
 	 * 
 	 */
