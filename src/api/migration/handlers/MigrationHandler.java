@@ -495,7 +495,9 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 			IProblem[] problems = compunit.getProblems();
 			
 			for( IProblem problem : problems ) {
-				errorList.add( problem.getMessage() );
+				String message = problem.getMessage();
+				if(message.contains("(") && message.contains(")"))
+					errorList.add(message);
 			}
 			//MethodVisitor visitor = new MethodVisitor();
 			//compunit.accept(visitor);
