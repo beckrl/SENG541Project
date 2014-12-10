@@ -14,13 +14,13 @@ public class Recommender {
 	private List<IMethod> changedMethods;
 	private List<IMethod> problemMethods;
 	
-	//variables storing recommendations when method's name is being analyze 
+	//variables storing recommendations when method's name is being analyzed 
 	private List<String> nameRecommendations;
 	private List<String> name_parameterRecommendations;
 	private List<String> name_parameter_returnRecommendations;
 	private List<String> name_returnRecommendations;
 	
-	//variables storing recommendations when method's name is not being analyze
+	//variables storing recommendations when method's name is not being analyzed
 	private List<String> return_parameterRecommendations;
 	private List<String> returnTypeRecommendations;
 	private List<String> parameterRecommendations;
@@ -132,7 +132,7 @@ public class Recommender {
 
 	
 	/*
-	 * 
+	 * If both parameter and return type comparison heuristic is selected
 	 */
 	private void parameter_returnComparison(List<IMethod> newJarMethods, List<IMethod> oldJarMethods,
 			List<String> errorList) throws JavaModelException {
@@ -223,7 +223,7 @@ public class Recommender {
 
 
 	/*
-	 * 
+	 * If both name and parameter comparison heuristic is selected
 	 */
 	private void name_parameterComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, 
 			List<String> errorList) {
@@ -281,12 +281,12 @@ public class Recommender {
 
 
 	/*
-	 * 
+	 * If both name and return type comparison heuristic is selected
 	 */
 	private void name_returnComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods,
 			List<String> errorList) throws JavaModelException {
 		name_returnRecommendations.add("----------------------------------------------------------\n");
-		name_returnRecommendations.add("Name & Return Comparison Recommendations\n");
+		name_returnRecommendations.add("Name & Return Type Comparison Recommendations\n");
 		name_returnRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
@@ -340,12 +340,12 @@ public class Recommender {
 
 
 	/*
-	 * 
+	 * If all heuristic is selected
 	 */
 	private void name_parameter_returnComaprisonAlgorithm(List<IMethod> newJarMethods, List <IMethod> oldJarMethods, 
 			List<String> errorList) throws JavaModelException {
 		name_parameter_returnRecommendations.add("----------------------------------------------------------\n");
-		name_parameter_returnRecommendations.add("Name, Parameters & Return Comparison Recommendations\n");
+		name_parameter_returnRecommendations.add("Name, Parameters & Return Type Comparison Recommendations\n");
 		name_parameter_returnRecommendations.add("----------------------------------------------------------\n");
 		
 		for(int i=0; i < errorList.size(); i++) {
@@ -405,72 +405,9 @@ public class Recommender {
 		}		
 	}
 
-
-	/*
-	 * Prints recommendations to the textBox in the second pop-up window
-	 */
-	public void printRecommendations(String algorithmSelection, JTextArea textbox) {		
-		if(algorithmSelection.contains("a")){
-			if(algorithmSelection.contains("b")){
-				if(algorithmSelection.contains("c")){
-					//message for recommendation based on method's name, parameter type and return type
-					for(String line: name_parameter_returnRecommendations){
-						textbox.append(line);
-					}
-				}
-				else{
-					//message for recommendation based on method's name and parameter type
-					for(String line: name_parameterRecommendations){
-						textbox.append(line);
-					}
-				}
-			}
-			else if(algorithmSelection.contains("c")){
-				//message for recommendation based on method's name and return type
-				for(String line: name_returnRecommendations){
-					textbox.append(line);
-				}
-			}
-			else{
-				//message for recommendation based only on method's name
-				for(String line: nameRecommendations){
-					textbox.append(line);
-				}
-			}
-		}
-		else{
-			if(algorithmSelection.contains("b")){
-				if(algorithmSelection.contains("c")){
-					//message for recommendation based on parameter type and return type
-					for(String line: return_parameterRecommendations){
-						textbox.append(line);
-					}
-				}
-				else{
-					//message for recommendation based on parameter type
-					for(String line: parameterRecommendations){
-						textbox.append(line);
-					}
-				}
-			}
-			else if(algorithmSelection.contains("c")){
-				//message for recommendation based on return type
-				for(String line: returnTypeRecommendations){
-					textbox.append(line);
-				}
-			}
-			else{
-				//nothing has been chosen!
-				textbox.append("You haven't click on any of the check box which will run a set of algorithms, \n"
-						+ "that will allow a profound analysis of recommendations for your migration API if you\n"
-						+ "have done something innapropietly. Please click on as many options you wish.");
-			}			
-		}
-	}
-	
 	
 	/*
-	 * 
+	 * If only name comparison heuristic is selected
 	 */
 	public void nameComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) {
 		nameRecommendations.add("----------------------------------------------------------\n");
@@ -512,7 +449,7 @@ public class Recommender {
 	
 	
 	/*
-	 * 
+	 * If only parameter comparison heuristic is selected
 	 */
 	public void parameterComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) {
 		parameterRecommendations.add("----------------------------------------------------------\n");
@@ -592,7 +529,7 @@ public class Recommender {
 	
 	
 	/*
-	 * 
+	 * If only return type comparison heuristic is selected
 	 */
 	public void returnTypeComparisonAlgorithm(List<IMethod> newJarMethods, List<String> errorList) {
 		returnTypeRecommendations.add("----------------------------------------------------------\n");
@@ -606,6 +543,68 @@ public class Recommender {
 			returnTypeRecommendations.add("Since IProblem doesn't provide return types, by myself I can't do much.\n"
 					+ "Sorry, maybe on the next version or if we ever figure out how to get return types from IProblem\n"
 					+ "we would be able to suggest methods that return the same type as the error prompts.\n");
+		}
+	}
+	
+	
+	/*
+	 * Prints recommendations to the textBox in the second pop-up window
+	 */
+	public void printRecommendations(String algorithmSelection, JTextArea textbox) {
+		System.out.println("AlgorithmSelection: " + algorithmSelection);
+		if(algorithmSelection.contains("a")){
+			if(algorithmSelection.contains("b")){
+				if(algorithmSelection.contains("c")){
+					//message for recommendation based on method's name, parameter type and return type
+					for(String line: name_parameter_returnRecommendations){
+						textbox.append(line);
+					}
+				}
+				else{
+					//message for recommendation based on method's name and parameter type
+					for(String line: name_parameterRecommendations){
+						textbox.append(line);
+					}
+				}
+			}
+			else if(algorithmSelection.contains("c")){
+				//message for recommendation based on method's name and return type
+				for(String line: name_returnRecommendations){
+					textbox.append(line);
+				}
+			}
+			else{
+				//message for recommendation based only on method's name
+				for(String line: nameRecommendations){
+					textbox.append(line);
+				}
+			}
+		}
+		else{
+			if(algorithmSelection.contains("b")){
+				if(algorithmSelection.contains("c")){
+					//message for recommendation based on parameter type and return type
+					for(String line: return_parameterRecommendations){
+						textbox.append(line);
+					}
+				}
+				else{
+					//message for recommendation based on parameter type
+					for(String line: parameterRecommendations){
+						textbox.append(line);
+					}
+				}
+			}
+			else if(algorithmSelection.contains("c")){
+				//message for recommendation based on return type
+				for(String line: returnTypeRecommendations){
+					textbox.append(line);
+				}
+			}
+			else{
+				//nothing has been chosen!
+				textbox.append("You haven't checked off any heuristics. Please do so in order to get some recommendations.");
+			}			
 		}
 	}
 	
