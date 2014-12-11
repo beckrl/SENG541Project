@@ -18,7 +18,7 @@ public class Recommender {
 	/*
 	 * Constructor
 	 */
-	public Recommender(List<IMethod> oldJarMethods, List<IMethod> newJarMethods, List<String> errorList, JTextArea textBox) {
+	public Recommender(List<IMethod> oldJarMethods, List<String> errorList, JTextArea textBox) {
 		// Maps each IProblem to an equivalent IMethod inside oldJarMethods and add to problemMethods list
 		problemMethods = new ArrayList<IMethod>();
 		for(String message : errorList) {
@@ -45,7 +45,7 @@ public class Recommender {
 	/*
 	 * Executes the selected algorithms
 	 */
-	public void executeAlgorithms(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList, String algorithmSelection) throws JavaModelException {
+	public void executeAlgorithms(List<IMethod> newJarMethods, String algorithmSelection) throws JavaModelException {
 		recommendations= new ArrayList<String>();
 		
 		if (algorithmSelection.contains("a")){
@@ -58,21 +58,21 @@ public class Recommender {
 			if (algorithmSelection.contains("b")){
 				if(algorithmSelection.contains("c")){
 					//checking for errors by analyzing methods name, return type and parameters
-					name_parameter_returnComaprisonAlgorithm(newJarMethods, oldJarMethods, errorList);
+					name_parameter_returnComaprisonAlgorithm(newJarMethods);
 				}
 				else{
 					//checking for errors by analyzing methods name and their parameters type
-					name_parameterComparisonAlgorithm(newJarMethods, oldJarMethods, errorList);
+					name_parameterComparisonAlgorithm(newJarMethods);
 				}
 				
 			}
 			else if (algorithmSelection.contains("c")){
 				//checking for errors by analyzing methods name and their return type
-				name_returnComparisonAlgorithm(newJarMethods, oldJarMethods, errorList);
+				name_returnComparisonAlgorithm(newJarMethods);
 			}
 			else{
 				//checking for errors by analyzing only methods name
-				nameComparisonAlgorithm(newJarMethods, oldJarMethods, errorList);
+				nameComparisonAlgorithm(newJarMethods);
 			}
 		}
 		else{
@@ -84,16 +84,16 @@ public class Recommender {
 			if(algorithmSelection.contains("b")){
 				if(algorithmSelection.contains("c")){
 					//checking for errors by analyzing methods by their return and parameter type
-					parameter_returnComparison(newJarMethods, oldJarMethods, errorList);
+					parameter_returnComparison(newJarMethods);
 				}
 				else{
 					//checking for errors by analyzing methods by their parameter type
-					parameterComparisonAlgorithm(newJarMethods, oldJarMethods, errorList);
+					parameterComparisonAlgorithm(newJarMethods);
 				}
 			}
 			else if(algorithmSelection.contains("c")){
 				//checking errors for only return types
-				returnTypeComparisonAlgorithm(newJarMethods, errorList);
+				returnTypeComparisonAlgorithm(newJarMethods);
 			}
 			else{
 				//nothing has been chosen, it will display nothing has been chosen!
@@ -105,7 +105,7 @@ public class Recommender {
 	/*
 	 * If both parameter and return type comparison heuristic is selected
 	 */
-	private void parameter_returnComparison(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
+	private void parameter_returnComparison(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Parameter & Return Type Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -137,7 +137,7 @@ public class Recommender {
 	/*
 	 * If both name and parameter comparison heuristic is selected
 	 */
-	private void name_parameterComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
+	private void name_parameterComparisonAlgorithm(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Name & Parameter Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -172,7 +172,7 @@ public class Recommender {
 	/*
 	 * If both name and return type comparison heuristic is selected
 	 */
-	private void name_returnComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
+	private void name_returnComparisonAlgorithm(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Name & Return Type Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -207,7 +207,7 @@ public class Recommender {
 	/*
 	 * If all heuristic is selected
 	 */
-	private void name_parameter_returnComaprisonAlgorithm(List<IMethod> newJarMethods, List <IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
+	private void name_parameter_returnComaprisonAlgorithm(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Name, Parameters & Return Type Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -238,7 +238,7 @@ public class Recommender {
 	/*
 	 * If only name comparison heuristic is selected
 	 */
-	private void nameComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
+	private void nameComparisonAlgorithm(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Name Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -275,7 +275,7 @@ public class Recommender {
 	/*
 	 * If only parameter comparison heuristic is selected
 	 */
-	private void parameterComparisonAlgorithm(List<IMethod> newJarMethods, List<IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
+	private void parameterComparisonAlgorithm(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Parameter Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -310,7 +310,7 @@ public class Recommender {
 	/*
 	 * If only return type comparison heuristic is selected
 	 */
-	private void returnTypeComparisonAlgorithm(List<IMethod> newJarMethods, List<String> errorList) throws JavaModelException {
+	private void returnTypeComparisonAlgorithm(List<IMethod> newJarMethods) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Return Type Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");

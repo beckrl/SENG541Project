@@ -263,7 +263,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				printInfoToConsole();
 				
 				// Create the recommender
-				recommender = new Recommender(oldJarMethods, newJarMethods, errorList, textBox);
+				recommender = new Recommender(oldJarMethods, errorList, textBox);
 			}
 		}		
 	}
@@ -427,7 +427,7 @@ public class MigrationHandler extends AbstractHandler implements ActionListener{
 				
 				// Invokes the recommender class
 				try {
-					recommender.executeAlgorithms(newJarMethods, oldJarMethods, errorList, algorithmSelection);
+					recommender.executeAlgorithms(newJarMethods, algorithmSelection);
 				} catch (JavaModelException e1) {
 					e1.printStackTrace();
 				}
