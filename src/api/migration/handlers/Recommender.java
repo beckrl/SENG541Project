@@ -131,87 +131,6 @@ public class Recommender {
 				recommendations.add("No recommendations could be determined.\n");
 			}
 		}
-		
-		/*
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getProblemMethodName( errorList.get(i) );
-			recommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			recommendations.add("Recommendation(s):\n");
-			
-			for(int newJar=0; newJar < newJarMethods.size(); newJar++) {
-				if(errorList.get(i).contains("(int")){
-					for(String parameter : newJarMethods.get(newJar).getParameterTypes()){
-						if(parameter.equals("I")&& newJarMethods.get(newJar).getParameterTypes().length==1){
-							for(int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-								if(oldJarMethods.get(oldJar).getReturnType().equals(newJarMethods.get(newJar).getReturnType())){
-									recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-											"\nis a method that uses integer as parameter as well has the same return type, \n"
-											+ "this is a possible option to replace "+errorMethodName + " with.\n");
-								}
-							}
-						}
-						else if(parameter.equals("I")&& newJarMethods.get(newJar).getParameterTypes().length!=1){
-							recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses integer as parameter as well, but this version only\n"
-									+ "handles one argument within the methods.\n");
-							break;
-						}
-					}
-				}
-				else if(errorList.get(i).contains("()")){
-					if(newJarMethods.get(newJar).getParameterTypes().length==0){
-						recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that does not use parameters as well, this is a possible option to\n"
-									+ "replace "+errorMethodName + " with.\n");
-							break;
-					}
-				}
-				else if(errorList.get(i).contains("(String")){
-					for(String parameter : newJarMethods.get(newJar).getParameterTypes()){
-						if(parameter.equals("Ljava.lang.String;")&& newJarMethods.get(newJar).getParameterTypes().length==1){
-							for(int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-								if(oldJarMethods.get(oldJar).getReturnType().equals(newJarMethods.get(newJar).getReturnType())){
-									recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-											"\nis a method that uses String as parameter as well has the same return type, \n"
-											+ "this is a possible option to replace "+errorMethodName + " with.\n");
-								}
-							}
-						}
-						else if(parameter.equals("Ljava.lang.String;")&& newJarMethods.get(newJar).getParameterTypes().length!=1){
-							recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses String as parameter as well, but this version only\n"
-									+ "handles one argument within the methods.\n");
-							break;
-						}
-					}
-				}
-				else if(errorList.get(i).contains("(double")){
-					for(String parameter : newJarMethods.get(newJar).getParameterTypes()){
-						if(parameter.equals("D")&& newJarMethods.get(newJar).getParameterTypes().length==1){
-							for(int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-								if(oldJarMethods.get(oldJar).getReturnType().equals(newJarMethods.get(newJar))){
-									recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-											"\nis a method that uses double as parameter as well has the same return type, \n"
-											+ "this is a possible option to replace "+errorMethodName + " with.\n");
-								}
-							}
-						}
-						else if(parameter.equals("D")&& newJarMethods.get(newJar).getParameterTypes().length!=1){
-							recommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses double as parameter as well, but this version only\n"
-									+ "handles one argument within the methods.\n");
-							break;
-						}
-					}
-				}
-				else if(newJar== newJarMethods.size()-1){
-					recommendations.add("The current version only handles problem with argument types of: \n"
-							+ "void, double, int and String. Sorry for the inconvenience, but I can't support this\n"
-							+ "type of problem.\n");
-				}
-			}
-		}
-		*/
 	}
 
 
@@ -247,55 +166,6 @@ public class Recommender {
 				recommendations.add("No recommendations could be determined.\n");
 			}
 		}
-		
-		/*
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getProblemMethodName( errorList.get(i) );
-			recommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			recommendations.add("Recommendation(s):\n");
-			
-			for(int newJar=0; newJar < newJarMethods.size(); newJar++) {
-				for( int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-					if(errorList.get(i).contains(oldJarMethods.get(oldJar).getElementName())){
-						if(errorList.get(i).contains(newJarMethods.get(newJar).getElementName())){
-							if(newJarMethods.get(newJar).getParameterTypes().equals(oldJarMethods.get(oldJar).getParameterTypes())){
-								recommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-										+ "jar versions and it's generating an error whenever the program compiles.\n"
-										+ "As well this method has the same parameter in both versions.\n"
-										+ "My guessing is this method has a different return type.\n"
-										+ "Please be causious and create a new method to implement your new logic, if you are \n"
-										+ "not sure how this method behaves.\n");
-								newJar= newJarMethods.size();
-								oldJar= oldJarMethods.size();
-							}
-							else{
-								recommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-										+ "jar versions and it's generating an error whenever the program compiles.\n"
-										+ "But the methods differ on the arguments. Most likely the problem can be fix by\n"
-										+ "updating your arguments. By switching from: "+ oldJarMethods.get(oldJar).getParameterTypes() +" to: \n"
-										+ newJarMethods.get(newJar).getParameterTypes()+"\n"
-										+ "Please be causious and create a new method to implement your new logic, if you are \n"
-										+ "not sure how this method behaves.\n");
-								newJar= newJarMethods.size();
-								oldJar= oldJarMethods.size();
-							}
-							
-						}
-					}
-					else if(newJarMethods.get(newJar).getElementName()==errorMethodName && oldJar==oldJarMethods.size()-1){
-						recommendations.add("The method "+newJarMethods.get(newJar).getElementName() + "is generating a compiling error.\n"
-								+ "As well, this method is new considering it didn't exist in the previous jar version. Please make sure\n"
-								+ "the return type of the new jar version is the same as your running code, as well the argument types.\n");
-					}
-					else if(oldJar== oldJarMethods.size()-1 && newJar== newJarMethods.size()-1){
-						recommendations.add("The generated problem doesn't have this method neither in the previous\n"
-								+ "jar version nor in the new jar version. Feel free to create a new method that implements\n"
-								+ "what ever logic you wish with this name.\n");
-					}
-				}
-			}
-		}
-		*/
 	}
 
 
@@ -331,63 +201,13 @@ public class Recommender {
 				recommendations.add("No recommendations could be determined.\n");
 			}
 		}
-		
-		/*
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getProblemMethodName( errorList.get(i) );
-			recommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			recommendations.add("Recommendation(s):\n");
-			
-			for(int newJar=0; newJar < newJarMethods.size(); newJar++) {
-				for( int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-					if(errorList.get(i).contains(oldJarMethods.get(oldJar).getElementName())){
-						if(errorList.get(i).contains(newJarMethods.get(newJar).getElementName())){
-							if(newJarMethods.get(newJar).getReturnType().equals(oldJarMethods.get(oldJar).getReturnType())){
-								recommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-										+ "jar versions and it's generating an error whenever the program compiles.\n"
-										+ "As well this method has the same return type in both versions.\n"
-										+ "My guessing is this method has different arguments compared to the previous jar version.\n"
-										+ "Please be causious and create a new method to implement your new logic, if you are \n"
-										+ "not sure how this method behaves.\n");
-								newJar= newJarMethods.size();
-								oldJar= oldJarMethods.size();
-							}
-							else{
-								recommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-										+ "jar versions and it's generating an error whenever the program compiles.\n"
-										+ "But the methods differ on the return type. Most likely the problem can be fix by\n"
-										+ "updating your return type. By switching from: "+ oldJarMethods.get(oldJar).getReturnType() +" to: \n"
-										+ newJarMethods.get(newJar).getReturnType()+"\n"
-										+ "Please be causious and create a new method to implement your new logic, if you are \n"
-										+ "not sure how this method behaves.\n");
-								newJar= newJarMethods.size();
-								oldJar= oldJarMethods.size();
-							}
-							
-						}
-					}
-					else if(newJarMethods.get(newJar).getElementName()==errorMethodName && oldJar==oldJarMethods.size()-1){
-						recommendations.add("The method "+newJarMethods.get(newJar).getElementName() + "is generating a compiling error.\n"
-								+ "As well, this method is new considering it didn't exist in the previous jar version. Please make sure\n"
-								+ "the return type of the new jar version is the same as your running code, as well the argument types.\n");
-					}
-					else if(oldJar== oldJarMethods.size()-1 && newJar== newJarMethods.size()-1){
-						recommendations.add("The generated problem doesn't have this method neither in the previous\n"
-								+ "jar version nor in the new jar version. Feel free to create a new method that implements\n"
-								+ "what ever logic you wish with this name.\n");
-					}
-				}
-			}
-		}
-		*/
 	}
 
 
 	/*
 	 * If all heuristic is selected
 	 */
-	private void name_parameter_returnComaprisonAlgorithm(List<IMethod> newJarMethods, List <IMethod> oldJarMethods, 
-			List<String> errorList) throws JavaModelException {
+	private void name_parameter_returnComaprisonAlgorithm(List<IMethod> newJarMethods, List <IMethod> oldJarMethods, List<String> errorList) throws JavaModelException {
 		recommendations.add("----------------------------------------------------------\n");
 		recommendations.add("Name, Parameters & Return Type Comparison Recommendations\n");
 		recommendations.add("----------------------------------------------------------\n");
@@ -412,64 +232,6 @@ public class Recommender {
 				recommendations.add("You will have to investigate further to find a solution to the problem.\n");
 			}
 		}
-		
-		/*
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getProblemMethodName( errorList.get(i) );
-			name_parameter_returnRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			name_parameter_returnRecommendations.add("Recommendation(s):\n");
-			
-			for(int newJar=0; newJar < newJarMethods.size(); newJar++) {
-				for( int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-					if(errorList.get(i).contains(oldJarMethods.get(oldJar).getElementName())){
-						if(errorList.get(i).contains(newJarMethods.get(newJar).getElementName())){
-							if(newJarMethods.get(newJar).getReturnType().equals(oldJarMethods.get(oldJar).getReturnType())){
-								if(newJarMethods.get(newJar).getParameterTypes().equals(oldJarMethods.get(oldJar).getReturnType())){
-									name_parameter_returnRecommendations.add("The method"+errorMethodName+ " is identical on both jar versions\n"
-											+ "with respect: method's name, arugments and return type. Your logical problem\n"
-											+ "is elsewhere, please check your class name or privacy settings.\n");
-									newJar= newJarMethods.size();
-									oldJar= oldJarMethods.size();
-								}
-								else{
-									name_parameter_returnRecommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-											+ "jar versions and it's generating an error whenever the program compiles.\n"
-											+ "As well this method has the same return type in both versions.\n"
-											+ "My guessing is this method has different arguments compared to the previous jar version.\n"
-											+ "Please be causious and create a new method to implement your new logic, if you are \n"
-											+ "not sure how this method behaves.\n");
-									newJar= newJarMethods.size();
-									oldJar= oldJarMethods.size();	
-								}
-							}
-							else{
-								name_parameter_returnRecommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-										+ "jar versions and it's generating an error whenever the program compiles.\n"
-										+ "But the methods differ on the return type. Most likely the problem can be fix by\n"
-										+ "updating your return type. By switching from: "+ oldJarMethods.get(oldJar).getReturnType() +" to: \n"
-										+ newJarMethods.get(newJar).getReturnType()+"\n"
-										+ "Please be causious and create a new method to implement your new logic, if you are \n"
-										+ "not sure how this method behaves.\n");
-								newJar= newJarMethods.size();
-								oldJar= oldJarMethods.size();
-							}
-							
-						}
-					}
-					else if(newJarMethods.get(newJar).getElementName()==errorMethodName && oldJar==oldJarMethods.size()-1){
-						name_parameter_returnRecommendations.add("The method "+newJarMethods.get(newJar).getElementName() + "is generating a compiling error.\n"
-								+ "As well, this method is new considering it didn't exist in the previous jar version. Please make sure\n"
-								+ "the return type of the new jar version is the same as your running code, as well the argument types.\n");
-					}
-					else if(oldJar== oldJarMethods.size()-1 && newJar== newJarMethods.size()-1){
-						name_parameter_returnRecommendations.add("The generated problem doesn't have this method neither in the previous\n"
-								+ "jar version nor in the new jar version. Feel free to create a new method that implements\n"
-								+ "what ever logic you wish with this name.\n");
-					}
-				}
-			}
-		}
-		*/
 	}
 
 	
@@ -507,40 +269,6 @@ public class Recommender {
 				recommendations.add("No recommendations could be determined.\n");
 			}
 		}
-		
-		/*
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getProblemMethodName( errorList.get(i) );
-			nameRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			nameRecommendations.add("Recommendation(s):\n");
-			
-			for(int newJar=0; newJar < newJarMethods.size(); newJar++) {
-				for( int oldJar=0; oldJar<oldJarMethods.size(); oldJar++){
-					if(errorList.get(i).contains(oldJarMethods.get(oldJar).getElementName())){
-						if(errorList.get(i).contains(newJarMethods.get(newJar).getElementName())){
-							nameRecommendations.add("The method "+ errorMethodName+ " is currently being implemented in both\n"
-									+ "jar versions and it's generating an error whenever the program compiles.\n"
-									+ "My guessing is this method has either a new parameter types or a new return type.\n"
-									+ "Please be causious and create a new method to implement your new logic, if you are \n"
-									+ "not sure how this method behaves.\n");
-							newJar= newJarMethods.size();
-							oldJar= oldJarMethods.size();
-						}
-					}
-					else if(newJarMethods.get(newJar).getElementName()==errorMethodName && oldJar==oldJarMethods.size()-1){
-						nameRecommendations.add("The method "+newJarMethods.get(newJar).getElementName() + "is generating a compiling error.\n"
-								+ "As well, this method is new considering it didn't exist in the previous jar version. Please make sure\n"
-								+ "the return type of the new jar version is the same as your running code, as well the argument types.\n");
-					}
-					else if(oldJar== oldJarMethods.size()-1 && newJar== newJarMethods.size()-1){
-						nameRecommendations.add("The generated problem doesn't have this method neither in the previous\n"
-								+ "jar version nor in the new jar version. Feel free to create a new method that implements\n"
-								+ "what ever logic you wish with this name.\n");
-					}
-				}
-			}
-		}
-		*/
 	}
 	
 	
@@ -576,78 +304,6 @@ public class Recommender {
 				recommendations.add("No recommendations could be determined.\n");
 			}
 		}
-		
-		/*
-		for(int i=0; i < errorList.size(); i++) {
-			String errorMethodName = getProblemMethodName( errorList.get(i) );
-			parameterRecommendations.add("\nError Method Name: " + errorMethodName + "\n");
-			parameterRecommendations.add("Recommendation(s):\n");
-			
-			for(int newJar=0; newJar < newJarMethods.size(); newJar++) {
-				if(errorList.get(i).contains("(int")){
-					for(String parameter : newJarMethods.get(newJar).getParameterTypes()){
-						if(parameter.equals("I")&& newJarMethods.get(newJar).getParameterTypes().length==1){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses integer as parameter as well, this is a possible option to\n"
-									+ "replace "+errorMethodName + " with.\n");
-							break;
-						}
-						else if(parameter.equals("I")&& newJarMethods.get(newJar).getParameterTypes().length!=1){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses integer as parameter as well, but this version only\n"
-									+ "handles one argument within the methods.\n");
-							break;
-						}
-					}
-				}
-				else if(errorList.get(i).contains("()")){
-					if(newJarMethods.get(newJar).getParameterTypes().length==0){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that does not use parameters as well, this is a possible option to\n"
-									+ "replace "+errorMethodName + " with.\n");
-							break;
-					}
-				}
-				else if(errorList.get(i).contains("(String")){
-					for(String parameter : newJarMethods.get(newJar).getParameterTypes()){
-						if(parameter.equals("Ljava.lang.String;")&& newJarMethods.get(newJar).getParameterTypes().length==1){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that use String as parameters as well, this is a possible option to\n"
-									+ "replace "+errorMethodName + " with.\n");
-							break;
-						}
-						else if(parameter.equals("Ljava.lang.String;")&& newJarMethods.get(newJar).getParameterTypes().length!=1){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses String as parameter as well, but this version only\n"
-									+ "handles one argument within the methods.\n");
-							break;
-						}
-					}
-				}
-				else if(errorList.get(i).contains("(double")){
-					for(String parameter : newJarMethods.get(newJar).getParameterTypes()){
-						if(parameter.equals("D")&& newJarMethods.get(newJar).getParameterTypes().length==1){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that use Double as parameters as well, this is a possible option to\n"
-									+ "replace "+errorMethodName + " with.\n");
-							break;
-						}
-						else if(parameter.equals("D")&& newJarMethods.get(newJar).getParameterTypes().length!=1){
-							parameterRecommendations.add("The following method: "+ newJarMethods.get(newJar).getElementName()+
-									"\nis a method that uses double as parameter as well, but this version only\n"
-									+ "handles one argument within the methods.\n");
-							break;
-						}
-					}
-				}
-				else if(newJar== newJarMethods.size()-1){
-					parameterRecommendations.add("The current version only handles problem with argument types of: \n"
-							+ "void, double, int and String. Sorry for the inconvenience, but I can't support this\n"
-							+ "type of problem.\n");
-				}
-			}
-		}
-		*/
 	}
 	
 	
@@ -794,10 +450,8 @@ public class Recommender {
 		try {
 			returnType = parseType(method.getReturnType());
 		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String[] args = method.getParameterTypes();
@@ -812,7 +466,6 @@ public class Recommender {
 			try {
 				result += parseType(args[0]) + ")";
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -821,7 +474,6 @@ public class Recommender {
 				try {
 					result += parseType(arg) + ",";
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
